@@ -19,8 +19,8 @@ jobs:
         run: cp 'source-repo/software/python/intro comunicacion/instrumental.py' instrumental.py
       - name: Commit and push changes
         run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
+          git config --local user.email "javitau459@gmail.com"
+          git config --local user.name "javidelrojoo"
           git add instrumental.py
           git commit -m "Copy instrumental.py from diegoshalom/labosdf repository"
           git push
