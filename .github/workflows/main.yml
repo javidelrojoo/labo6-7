@@ -1,26 +1,26 @@
-name: Add File
+name: Copy File
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  add-file:
+  copy-file:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout other repository
-      uses: actions/checkout@v2
-      with:
-        repository: diegoshalom/labosdf
-        ref: master
-    - name: Add file
-      run: |
-        cd 'software/python/intro comunicacion'
-        cp instrumental.py .
-    - name: Commit and push changes
-      run: |
-        git config --global user.email "javitau459@gmail.com"
-        git config --global user.name "javidelrojoo"
-        git add .
-        git commit -m "Add file"
-        git push origin main
+      - name: Checkout source repository
+        uses: actions/checkout@v2
+        with:
+          repository: diegoshalom/labosdf
+          path: source-repo
+          ref: master
+      - name: Copy file to destination repository
+        run: cp 'source-repo/software/python/intro comunicacion/instrumental.py' instrumental.py
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add instrumental.py
+          git commit -m "Copy instrumental.py from diegoshalom/labosdf repository"
+          git push
