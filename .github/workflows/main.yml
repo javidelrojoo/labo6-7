@@ -1,11 +1,11 @@
-name: Update File
+name: Add File
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  update-file:
+  add-file:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout other repository
@@ -13,14 +13,14 @@ jobs:
       with:
         repository: diegoshalom/labosdf
         ref: master
-    - name: Update file
+    - name: Add file
       run: |
-        cd '/software/python/intro comunicacion/'
-        echo "New content" > instrumental.py
+        cd 'diegoshalom/labosdf/blob/master/software/python/intro comunicacion'
+        cp instrumental.py javidelrojoo/labo6-7
     - name: Commit and push changes
       run: |
         git config --global user.email "javitau459@gmail.com"
         git config --global user.name "javidelrojoo"
-        git add '/software/python/intro comunicacion/instrumental.py'
-        git commit -m "Update file"
+        git add .
+        git commit -m "Add file"
         git push origin main
