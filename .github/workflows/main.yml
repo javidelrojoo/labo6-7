@@ -15,9 +15,8 @@ jobs:
         ref: master
     - name: Add file
       run: |
-        ls
         cd 'software/python/intro comunicacion'
-        cp instrumental.py
+        cp instrumental.py .
     - name: Commit and push changes
       run: |
         git config --global user.email "javitau459@gmail.com"
