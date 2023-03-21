@@ -17,7 +17,7 @@ jobs:
       run: |
         ls
         cd 'software/python/intro comunicacion'
-        cd ../../..
+        cd ../../../..
         ls
         cp instrumental.py javidelrojoo/labo6-7
     - name: Commit and push changes
