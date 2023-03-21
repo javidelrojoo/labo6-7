@@ -1,0 +1,26 @@
+name: Update File
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update-file:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout other repository
+      uses: actions/checkout@v2
+      with:
+        repository: diegoshalom/labosdf
+        ref: main
+    - name: Update file
+      run: |
+        cd /software/python/intro comunicacion/
+        echo "New content" > instrumental.py
+    - name: Commit and push changes
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git add /software/python/intro comunicacion/instrumental.py
+        git commit -m "Update file"
+        git push origin main
