@@ -15,7 +15,8 @@ jobs:
         ref: master
     - name: Add file
       run: |
-        cd 'diegoshalom/labosdf/blob/master/software/python/intro comunicacion'
+        ls
+        cd 'blob/master/software/python/intro comunicacion'
         cp instrumental.py javidelrojoo/labo6-7
     - name: Commit and push changes
       run: |
