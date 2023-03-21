@@ -15,12 +15,12 @@ jobs:
         ref: master
     - name: Update file
       run: |
-        cd /software/python/intro comunicacion/
+        cd '/software/python/intro comunicacion/'
         echo "New content" > instrumental.py
     - name: Commit and push changes
       run: |
         git config --global user.email "javitau459@gmail.com"
         git config --global user.name "javidelrojoo"
-        git add /software/python/intro comunicacion/instrumental.py
+        git add '/software/python/intro comunicacion/instrumental.py'
         git commit -m "Update file"
         git push origin main
