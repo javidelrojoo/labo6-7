@@ -25,5 +25,5 @@ jobs:
           git add instrumental.py
           git commit -m "Copy instrumental.py from diegoshalom/labosdf repository"
           git branch -M main
-          git remote add origin https://github.com/javidelrojoo/labo6-7.git
+          git remote add origin git@github.com:javidelrojoo/labo6-7.git
           git push -u origin main
