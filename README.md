@@ -2,7 +2,7 @@
 
 ***
 
-### _Martín Sattler, Javier Tau_
+### _Martín Sattler, Javier Tau Anzoátegui_
 
 Tema: Propiedades eléctricas de memristores basados en GCMO.
 
@@ -12,7 +12,7 @@ Lugar de trabajo: Laboratorio de Bajas Temperaturas (LBT), Departamento de Físi
 
 ***
 
-Este repositorio está centrado en recopilar el trabajo realizado en las experiencias, particular en el manejo del instrumento LCR meter de Tonghui.
+Este repositorio está centrado en recopilar el trabajo realizado en las experiencias, en particular en el manejo del instrumento LCR meter de Tonghui.
 
 ***
 

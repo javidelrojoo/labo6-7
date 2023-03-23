@@ -8,6 +8,6 @@ def save_csv(*data, filename, root='.\\', delimiter=',', header='', rewrite=Fals
         print('Este archivo ya existe, para sobreescribirlo usar el argumento rewrite')
         return
     if isfile:
-        print('ATENCIÓN: SE SOBREESCRIBIÓ EL ARCHIVO')
+        print('ATENCIÓN: SE SOBREESCRIBIRÁ EL ARCHIVO')
     np.savetxt(root+filename+'.csv', np.transpose(np.array([*data])), header=header, delimiter=delimiter)
     return
