@@ -59,3 +59,26 @@ class TH283X:
     
     def get_ores(self):
         return self._lcr.query('ORES?')
+
+    def set_func_imp(self, function):
+        self._lcr.write(f'FUNC:IMP {function}')
+        return
+    
+    def measure(self, function):
+        self.set_func_imp(function)
+        
+        self._lcr.write('TRIG')
+        self._lcr.query('*OPC?')
+        
+        result = self._lcr.query('FETC?')
+        meas_A, meas_B, *_ = result.split(',')
+        return float(meas_A), float(meas_B)
+    
+    def make_EI(self, n, f_min, f_max):
+        frecs = np.logspace(np.log10(f_min), np.log10(f_max), n)
+        Rs = np.zeros(n)
+        Xs = np.zeros(n)
+        for i, frec in enumerate(frecs):
+            self.set_freq(frec)
+            Rs[i], Xs[i] = self.measure('RX')
+        return Rs, Xs
