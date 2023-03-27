@@ -1,11 +1,11 @@
-import visa
+import pyvisa
 import numpy as np
 
 class TH283X:
     def __init__(self, name):
-        self._lcr = visa.ResourceManager().open_resource(name)
+        self._lcr = pyvisa.ResourceManager().open_resource(name)
         print(self._lcr.query("*IDN?"))
-    
+        self._lcr.timeout = None
     def __del__(self):
         self._lcr.close()
     
@@ -16,7 +16,7 @@ class TH283X:
         if value == 'MAX':
             self._lcr.write('FREQ MAX')
             return
-        self._lcr.write(f'FREQ {value}{units.upper()}HZ')
+        self._lcr.write(f'FREQ {round(value, 3)}{units.upper()}HZ')
         return
     
     def get_freq(self):
@@ -68,17 +68,19 @@ class TH283X:
         self.set_func_imp(function)
         
         self._lcr.write('TRIG')
-        self._lcr.query('*OPC?')
+        self._lcr.write('*OPC')
         
         result = self._lcr.query('FETC?')
         meas_A, meas_B, *_ = result.split(',')
         return float(meas_A), float(meas_B)
     
-    def make_EI(self, n, f_min, f_max):
-        frecs = np.logspace(np.log10(f_min), np.log10(f_max), n)
+    def make_EI(self, frecs, func):
+        n = len(frecs)
         Rs = np.zeros(n)
         Xs = np.zeros(n)
+        fs = np.zeros(n)
         for i, frec in enumerate(frecs):
             self.set_freq(frec)
-            Rs[i], Xs[i] = self.measure('RX')
-        return Rs, Xs
+            Rs[i], Xs[i] = self.measure(func)
+            fs[i] = self.get_freq()
+        return fs, Rs, Xs
