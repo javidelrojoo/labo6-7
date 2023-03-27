@@ -18,19 +18,20 @@ lcr._lcr.query('*OPC?')
 lcr._lcr.write('*OPC')
 lcr._lcr.query('FETC?')
 
-Z, phase = lcr.make_EI(1000, 20, 2e5, 'ZTD')
+frecs = np.logspace(np.log10(20), np.log10(2e5), 500)
+f, Z, phase = lcr.make_EI(frecs, 'ZTD')
 
-frecs = np.logspace(np.log10(20), 5, 1000)
 
-plt.plot(frecs, 20*np.log10(Z), '-o')
+
+plt.plot(f, 20*np.log10(Z), '-o')
 plt.xscale('log')
 plt.figure()
-plt.plot(frecs, phase, '-o')
+plt.plot(f, -phase, '-o')
 plt.xscale('log')
 plt.show()
 
 
-save_csv(frecs, Z, phase, filename='capacitor_.47F_bode', root='./pruebas/', delimiter=',', header='Barrido en logspace desde 100 Hz hasta 200 kHz a 1 V\n Cs [F], D')
+save_csv(f, Z, phase, filename='capacitor_.47F_1V', root='./bode_capacitor/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
 
 
 frecs = np.logspace(np.log10(20), np.log10(2e5), 1000)
