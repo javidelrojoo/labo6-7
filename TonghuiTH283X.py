@@ -1,6 +1,7 @@
 import pyvisa
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 class TH283X:
     def __init__(self, name):
@@ -80,10 +81,11 @@ class TH283X:
         Z = np.zeros(n)
         phase = np.zeros(n)
         f = np.zeros(n)
-        for i, frec in enumerate(frecs):
+        for i, frec in enumerate(tqdm(frecs)):
             self.set_freq(frec)
             Z[i], phase[i] = self.measure(func)
             f[i] = self.get_freq()
+            print(f[i])
         self.make_bode_plot(f, Z, phase)
         return f, Z, phase
     
@@ -103,3 +105,17 @@ class TH283X:
         plt.tight_layout()
         plt.show()
         return
+    
+    def set_DC_bias_volt(self, value):
+        self._lcr.write('BIAS:STAT ON')
+        if value == 'MIN':
+            self._lcr.write('BIAS:VOLT MIN')
+            return
+        if value == 'MAX':
+            self._lcr.write('BIAS:VOLT MAX')
+            return
+        self._lcr.write(f'BIAS:VOLT {value}')
+        return
+    
+    def set_DC_bias_off(self):
+        self._lcr.write('BIAS:STAT OFF')
