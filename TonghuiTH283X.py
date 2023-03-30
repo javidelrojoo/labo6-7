@@ -123,3 +123,21 @@ class TH283X:
     
     def set_DC_bias_off(self):
         self._lcr.write('BIAS:STAT OFF')
+    
+    def make_corr_open(self, min_frec, max_frec, log=True):
+        if log:
+            frecs = np.logspace(np.log10(min_frec), np.log10(max_frec), 201)
+        else:
+            frecs = np.linspace(min_frec, max_frec, 201)
+        for i in range(1, 202):
+            self._lcr.write(f'CORR:SPOT{i}:FREQ {round(frecs, 3)}')
+            self._lcr.write(f'CORR:SPOT{i}:OPEN')
+    
+    def make_corr_short(self, min_frec, max_frec, log=True):
+        if log:
+            frecs = np.logspace(np.log10(min_frec), np.log10(max_frec), 201)
+        else:
+            frecs = np.linspace(min_frec, max_frec, 201)
+        for i in range(1, 202):
+            self._lcr.write(f'CORR:SPOT{i}:FREQ {round(frecs, 3)}')
+            self._lcr.write(f'CORR:SPOT{i}:SHOR')
