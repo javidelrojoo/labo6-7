@@ -81,18 +81,22 @@ class TH283X:
         Z = np.zeros(n)
         phase = np.zeros(n)
         f = np.zeros(n)
+        fig, axs = plt.subplots(2, 1, sharex=True)
         for i, frec in enumerate(tqdm(frecs)):
             self.set_freq(frec)
             Z[i], phase[i] = self.measure(func)
             f[i] = self.get_freq()
-            print(f[i])
-        self.make_bode_plot(f, Z, phase)
+            axs[0].clear()
+            axs[1].clear()
+            self.make_bode_plot(f[:i], Z[:i], phase[:i], new_fig=False)
+            plt.pause(.005)
         return f, Z, phase
     
-    def make_bode_plot(self, f, Z, phase):
-        fig, axs = plt.subplots(2, 1, sharex=True)
+    def make_bode_plot(self, f, Z, phase, new_fig=True):
+        if new_fig:
+            fig, axs = plt.subplots(2, 1, sharex=True)
 
-        axs[0].plot(f, 20*np.log10(Z), 'C0')
+        axs[0].plot(f, np.log10(Z), 'C0')
         axs[0].set_ylabel('Ganancia [dB]')
         axs[0].set_xscale('log')
         axs[0].grid()
