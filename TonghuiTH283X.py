@@ -89,7 +89,7 @@ class TH283X:
             axs[0].clear()
             axs[1].clear()
             self.make_bode_plot(f[:i], Z[:i], phase[:i], new_fig=False)
-            plt.pause(.005)
+            plt.pause(.001)
         return f, Z, phase
     
     def make_bode_plot(self, f, Z, phase, new_fig=True):
