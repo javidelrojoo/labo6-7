@@ -82,10 +82,12 @@ class TH283X:
         phase = np.zeros(n)
         f = np.zeros(n)
         fig, axs = plt.subplots(2, 1, sharex=True)
-        for i, frec in enumerate(tqdm(frecs)):
+        pbar = tqdm(frecs)
+        for i, frec in enumerate(pbar):
             self.set_freq(frec)
             Z[i], phase[i] = self.measure(func)
             f[i] = self.get_freq()
+            pbar.set_description(f'{f[i]} Hz')
             axs[0].clear()
             axs[1].clear()
             self.make_bode_plot(f[:i], Z[:i], phase[:i], new_fig=False)
