@@ -90,16 +90,16 @@ class TH283X:
             pbar.set_description(f'{f[i]} Hz')
             axs[0].clear()
             axs[1].clear()
-            self.make_bode_plot(f[:i], Z[:i], phase[:i], new_fig=False)
+            self.make_bode_plot(f[:i], Z[:i], phase[:i], new_fig=False, axs=axs)
             plt.pause(.001)
         return f, Z, phase
     
-    def make_bode_plot(self, f, Z, phase, new_fig=True):
+    def make_bode_plot(self, f, Z, phase, new_fig=True, axs=None):
         if new_fig:
             fig, axs = plt.subplots(2, 1, sharex=True)
 
-        axs[0].plot(f, np.log10(Z), 'C0')
-        axs[0].set_ylabel('Ganancia [dB]')
+        axs[0].plot(f, Z, 'C0')
+        axs[0].set_ylabel('Impedancia [$\Omega$]')
         axs[0].set_xscale('log')
         axs[0].grid()
 
@@ -131,15 +131,19 @@ class TH283X:
             frecs = np.logspace(np.log10(min_frec), np.log10(max_frec), 201)
         else:
             frecs = np.linspace(min_frec, max_frec, 201)
-        for i in range(1, 202):
-            self._lcr.write(f'CORR:SPOT{i}:FREQ {round(frecs, 3)}')
-            self._lcr.write(f'CORR:SPOT{i}:OPEN')
+        for i in tqdm(range(1, 202)):
+            self._lcr.write(f'CORR:SPOT {i}:FREQ {round(frecs[i-1], 3)}')
+            self._lcr.write(f'CORR:SPOT {i}:OPEN')
+            while int(self._lcr.query('*STB?')) & 0x01:
+                pass
     
     def make_corr_short(self, min_frec, max_frec, log=True):
         if log:
             frecs = np.logspace(np.log10(min_frec), np.log10(max_frec), 201)
         else:
             frecs = np.linspace(min_frec, max_frec, 201)
-        for i in range(1, 202):
-            self._lcr.write(f'CORR:SPOT{i}:FREQ {round(frecs, 3)}')
-            self._lcr.write(f'CORR:SPOT{i}:SHOR')
+        for i in tqdm(range(1, 202)):
+            self._lcr.write(f'CORR:SPOT {i}:FREQ {round(frecs[i-1], 3)}')
+            self._lcr.write(f'CORR:SPOT {i}:SHOR')
+            while int(self._lcr.query('*STB?')) & 0x01:
+                pass
