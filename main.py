@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from save_csv import save_csv
 from tqdm import tqdm
 from TonghuiTH283X import TH283X
+import time
 
 lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 
@@ -44,8 +45,11 @@ lcr.make_corr_open(20, 200e3)
 
 lcr.make_bode_plot(f, Z, phase)
 
+toc = time.time()
+lcr.measure('ZTD')
+print(time.time() - toc)
 
-save_csv(f, Z, phase, filename='resistencia_10mOhm_ALC', root='resistencia/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+save_csv(f, Z, phase, filename='circuito3', root='circuito_memristor/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
 
 n = 200
 Zs = np.zeros(n)
@@ -54,9 +58,13 @@ for i in tqdm(range(n)):
     Zs[i], phases[i] = lcr.measure('ZTD')
 
 Zs1, phases1 = np.loadtxt('fast-med-slow/capacitor_R_.47F_29kOhm_1V_1kHz_MED.csv', delimiter=',', unpack=True, skiprows=2)
+Zs2, phases2 = np.loadtxt('fast-med-slow/capacitor_R_.47F_29kOhm_1V_1kHz_SLOW.csv', delimiter=',', unpack=True, skiprows=2)
+Zs3, phases3 = np.loadtxt('fast-med-slow/capacitor_R_.47F_29kOhm_1V_1kHz_FAST.csv', delimiter=',', unpack=True, skiprows=2)
+
 
 plt.plot(Zs1)
 plt.plot(Zs2)
+plt.plot(Zs3)
 plt.plot(Zs)
 plt.plot(Z_ALC)
 plt.show()
