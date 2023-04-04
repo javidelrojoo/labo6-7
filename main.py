@@ -45,7 +45,7 @@ lcr.make_corr_open(20, 200e3)
 lcr.make_bode_plot(f, Z, phase)
 
 
-save_csv(f, Z, phase, filename='resistencia_10mOhm_sincorrecciones', root='resistencia/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+save_csv(f, Z, phase, filename='resistencia_10mOhm_ALC', root='resistencia/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
 
 n = 200
 Zs = np.zeros(n)
@@ -53,10 +53,13 @@ phases = np.zeros(n)
 for i in tqdm(range(n)):
     Zs[i], phases[i] = lcr.measure('ZTD')
 
+Zs1, phases1 = np.loadtxt('fast-med-slow/capacitor_R_.47F_29kOhm_1V_1kHz_MED.csv', delimiter=',', unpack=True, skiprows=2)
+
 plt.plot(Zs1)
 plt.plot(Zs2)
 plt.plot(Zs)
+plt.plot(Z_ALC)
 plt.show()
-save_csv(Zs, phases, filename='capacitor_R_.47F_29kOhm_1V_1kHz_FAST', root='./fast-med-slow/', delimiter=',', header='Capacitor de 0.47 nF en serie con resistencia de 29 kOhm. Frecuencia fija en 1 kHz \n Z [Ohm], Fase [°]')
+save_csv(Zs, phases, filename='capacitor_R_.47F_29kOhm_1V_1kHz_MED-ALC', root='./fast-med-slow/', delimiter=',', header='Capacitor de 0.47 nF en serie con resistencia de 29 kOhm. Frecuencia fija en 1 kHz \n Z [Ohm], Fase [°]')
 
 data = np.loadtxt('bode_capacitor/capacitor_R_.47F_29kOhm_1V_FAST.csv', delimiter=',', unpack=True, skiprows=2)
