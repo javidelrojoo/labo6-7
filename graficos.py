@@ -184,23 +184,78 @@ plt.show()
 #FIGURA 7
 #########################
 # Los datos se guardaron mal
-fm, Zm, phasem = np.loadtxt('fast-med-slow\\capacitor_R_.47F_29kOhm_1V_1kHz_MED.csv', delimiter=',', unpack=True, skiprows=1)
+Zm, phasem = np.loadtxt('fast-med-slow\\capacitor_R_.47F_29kOhm_1V_1kHz_MED.csv', delimiter=',', unpack=True, skiprows=1)
 Zs, phases = np.loadtxt('fast-med-slow\\capacitor_R_.47F_29kOhm_1V_1kHz_SLOW.csv', delimiter=',', unpack=True, skiprows=1)
 Zf, phasef = np.loadtxt('fast-med-slow\\capacitor_R_.47F_29kOhm_1V_1kHz_FAST.csv', delimiter=',', unpack=True, skiprows=1)
 
-plt.plot(Zm)
-plt.plot(Zs)
-plt.plot(Zf)
-plt.show()
-
-plt.hist(Zm, color = 'C0', edgecolor = 'C0', histtype='step', label='MED')
-plt.hist(Zs, color = 'r', edgecolor = 'r', histtype='step', label='SLOW')
-plt.hist(Zf, color = 'g', edgecolor = 'g', histtype='step', label='FAST')
-plt.grid(alpha=0.1)
+plt.plot(Zm, label='MED')
+plt.plot(Zs, label='SLOW')
+plt.plot(Zf, label='FAST')
 plt.legend()
 plt.show()
+
+plt.hist(Zf, color = 'g', edgecolor = 'g', label='FAST', alpha=0.7)
+plt.hist(Zm, color = 'C0', edgecolor = 'C0', label='MED', alpha=0.7)
+plt.hist(Zs, color = 'r', edgecolor = 'r', label='SLOW', alpha=0.7)
+plt.xlabel('Impedancia [$\Omega$]')
+plt.grid(alpha=0.1)
+plt.legend()
+plt.savefig('graficos/hist-fast-med-slow.png', dpi=400)
+plt.show()
+
+print(f'FAST: {np.mean(Zf)} +/- {np.std(Zf)}\n MED: {np.mean(Zm)} +/- {np.std(Zm)}\n SLOW: {np.mean(Zs)} +/- {np.std(Zs)}\n')
 
 #########################
 #FIGURA 8
 #########################
 
+f, Z, phase = np.loadtxt('resistencia\\resistencia_10mOhm_correccion a 75Hz.csv', delimiter=',', unpack=True, skiprows=1)
+
+fig, axs = plt.subplots(2, 1, sharex=True)
+
+axs[0].plot(f, Z*1e-6, 'C0')
+axs[0].set_ylabel('Impedancia [M$\Omega$]')
+axs[0].set_xscale('log')
+axs[0].grid()
+
+axs[1].plot(f, phase, 'C1')
+axs[1].set_ylabel('Fase [°]')
+axs[1].set_xlabel('Frecuencia [Hz]')
+axs[1].grid()
+
+plt.tight_layout()
+plt.savefig('graficos/bode-resistencia-pura-con-picos-feos.png', dpi=400)
+plt.show()
+
+
+#########################
+#FIGURA 9
+#########################
+
+def Z_RC(f, R, C):
+    return 1/(np.sqrt(C**2*f**2+1/R**2))
+
+def phase_RC(f, R, C):
+    w = 2*np.pi*f
+    return -w*C*R**2/(1+C**2 * w**2 * R**2)
+
+f, Z, phase = np.loadtxt('resistencia\\resistencia_10mOhm_sincorrecciones.csv', delimiter=',', unpack=True, skiprows=1)
+
+f_err = 0.01/100 * f
+Z_err, phase_err = Z*1/100, phase/100
+
+popt_Z, pcov_Z = curve_fit(Z_RC, f, Z, p0 = [1e7, 4.5e-12], sigma=Z_err, absolute_sigma=True)
+print(f'R = ({popt_Z[0]*1e-6} +/- {np.sqrt(np.diag(pcov_Z))[0]*1e-6}) MOhm \n C = ({popt_Z[1]*1e12} +/- {np.sqrt(np.diag(pcov_Z))[1]*1e12}) pF')
+
+popt_phase, pcov_phase = curve_fit(phase_RC, f, phase, p0 = [*popt_Z], sigma=phase_err, absolute_sigma=True)
+print(f'R = ({popt_phase[0]*1e-3} +/- {np.sqrt(np.diag(pcov_phase))[0]*1e-3}) kOhm \n C = ({popt_phase[1]*1e9} +/- {np.sqrt(np.diag(pcov_phase))[1]*1e9}) nF')
+
+plt.plot(f, Z_RC(f, *popt_Z)*1e-6, 'r', label='Ajuste')
+plt.errorbar(f, Z*1e-6, xerr=f_err, yerr=Z_err*1e-6, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+plt.ylabel('|Z| [M$\Omega$]')
+plt.xlabel('Frecuencia [Hz]')
+plt.xscale('log')
+plt.legend()
+plt.grid()
+plt.savefig('graficos/bode-resistencia-pura.png', dpi=400)
+plt.show()
