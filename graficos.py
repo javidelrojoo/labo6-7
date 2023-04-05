@@ -242,7 +242,7 @@ def phase_RC(f, R, C):
 f, Z, phase = np.loadtxt('resistencia\\resistencia_10mOhm_sincorrecciones.csv', delimiter=',', unpack=True, skiprows=1)
 
 f_err = 0.01/100 * f
-Z_err, phase_err = Z*1/100, phase/100
+Z_err, phase_err = Z*3/100, phase/100
 
 popt_Z, pcov_Z = curve_fit(Z_RC, f, Z, p0 = [1e7, 4.5e-12], sigma=Z_err, absolute_sigma=True)
 print(f'R = ({popt_Z[0]*1e-6} +/- {np.sqrt(np.diag(pcov_Z))[0]*1e-6}) MOhm \n C = ({popt_Z[1]*1e12} +/- {np.sqrt(np.diag(pcov_Z))[1]*1e12}) pF')
@@ -257,5 +257,34 @@ plt.xlabel('Frecuencia [Hz]')
 plt.xscale('log')
 plt.legend()
 plt.grid()
-plt.savefig('graficos/bode-resistencia-pura.png', dpi=400)
+plt.savefig('graficos/impedancia-resistencia-pura.png', dpi=400)
+plt.show()
+
+#########################
+#FIGURA 10
+#########################
+def Z_RL(f, R, L):
+    w = 2*np.pi*f
+    return np.sqrt(R**2 + (w*L)**2)
+
+
+f, Z, phase = np.loadtxt('Caracterización\\medicion_corto.csv', delimiter=',', unpack=True, skiprows=1)
+
+f_err = 0.01/100 * f
+Z_err, phase_err = Z*3/100, phase*3/100
+
+popt_Z, pcov_Z = curve_fit(Z_RL, f, Z, p0 = [0, 0], sigma=Z_err, absolute_sigma=True)
+print(f'R = ({popt_Z[0]*1e3} +/- {np.sqrt(np.diag(pcov_Z))[0]*1e3}) mOhm \n L = ({popt_Z[1]*1e9} +/- {np.sqrt(np.diag(pcov_Z))[1]*1e9}) nH')
+
+popt_phase, pcov_phase = curve_fit(phase_RC, f, phase, p0 = [*popt_Z], sigma=phase_err, absolute_sigma=True)
+print(f'R = ({popt_phase[0]*1e-3} +/- {np.sqrt(np.diag(pcov_phase))[0]*1e-3}) kOhm \n C = ({popt_phase[1]*1e9} +/- {np.sqrt(np.diag(pcov_phase))[1]*1e9}) nF')
+
+plt.plot(f, Z_RL(f, *popt_Z), 'r', label='Ajuste')
+plt.errorbar(f, Z, xerr=f_err, yerr=Z_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+plt.ylabel('|Z| [$\Omega$]')
+plt.xlabel('Frecuencia [Hz]')
+plt.xscale('log')
+plt.legend()
+plt.grid()
+plt.savefig('graficos/impedancia-en-corto.png', dpi=400)
 plt.show()
