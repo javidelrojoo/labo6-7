@@ -288,3 +288,32 @@ plt.legend()
 plt.grid()
 plt.savefig('graficos/impedancia-en-corto.png', dpi=400)
 plt.show()
+
+#########################
+#FIGURA 11
+#########################
+
+
+
+f, Z, phase = np.loadtxt('circuito_memristor/circuito1.csv', delimiter=',', unpack=True, skiprows=1)
+
+f_err = 0.01/100 * f
+Z_err, phase_err = Z*3/100, phase*3/100
+
+plt.errorbar(f, Z, xerr=f_err, yerr=Z_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+plt.ylabel('|Z| [$\Omega$]')
+plt.xlabel('Frecuencia [Hz]')
+plt.xscale('log')
+plt.legend()
+plt.grid()
+# plt.savefig('graficos/impedancia-en-corto.png', dpi=400)
+plt.show()
+
+plt.figure()
+plt.errorbar(f, phase, xerr=f_err, yerr=np.abs(phase_err), color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+plt.ylabel('Fase [°]')
+plt.xlabel('Frecuencia [Hz]')
+plt.xscale('log')
+plt.legend()
+plt.grid()
+plt.show()

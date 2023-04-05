@@ -49,7 +49,7 @@ toc = time.time()
 lcr.measure('ZTD')
 print(time.time() - toc)
 
-save_csv(f, Z, phase, filename='circuito3', root='circuito_memristor/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+save_csv(f, Z, phase, filename='muestra-Au-Al', root='probe-station/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
 
 n = 200
 Zs = np.zeros(n)
@@ -71,3 +71,5 @@ plt.show()
 save_csv(Zs, phases, filename='capacitor_R_.47F_29kOhm_1V_1kHz_MED-ALC', root='./fast-med-slow/', delimiter=',', header='Capacitor de 0.47 nF en serie con resistencia de 29 kOhm. Frecuencia fija en 1 kHz \n Z [Ohm], Fase [°]')
 
 data = np.loadtxt('bode_capacitor/capacitor_R_.47F_29kOhm_1V_FAST.csv', delimiter=',', unpack=True, skiprows=2)
+
+
