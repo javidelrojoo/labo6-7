@@ -11,7 +11,7 @@ lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 lcr.set_freq(1e3)
 lcr.get_freq()
 
-lcr.set_volt(1)
+lcr.set_volt(0.4)
 lcr.get_volt()
 
 lcr.measure('ZTD')
@@ -23,6 +23,8 @@ lcr._lcr.query('FETC?')
 frecs = np.logspace(np.log10(20), np.log10(2e5), 500)
 # frecs = np.linspace(10e3, 2e5, 250)
 f, Z, phase = lcr.make_EI(frecs, 'ZTD')
+save_csv(f, Z, phase, filename='muestra-Al-Au-(41-32)-400mV', root='probe-station/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+
 
 lcr.set_DC_bias_volt(0)
 lcr.set_DC_bias_off()
@@ -49,8 +51,6 @@ toc = time.time()
 lcr.measure('ZTD')
 print(time.time() - toc)
 
-save_csv(f, Z, phase, filename='muestra-Au-Al', root='probe-station/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
-
 n = 200
 Zs = np.zeros(n)
 phases = np.zeros(n)
@@ -70,6 +70,7 @@ plt.plot(Z_ALC)
 plt.show()
 save_csv(Zs, phases, filename='capacitor_R_.47F_29kOhm_1V_1kHz_MED-ALC', root='./fast-med-slow/', delimiter=',', header='Capacitor de 0.47 nF en serie con resistencia de 29 kOhm. Frecuencia fija en 1 kHz \n Z [Ohm], Fase [°]')
 
-data = np.loadtxt('bode_capacitor/capacitor_R_.47F_29kOhm_1V_FAST.csv', delimiter=',', unpack=True, skiprows=2)
+f_1, Z_1, phase_1 = np.loadtxt('probe-station/muestra-Au-Au-(14-24).csv', delimiter=',', unpack=True, skiprows=1)
+lcr.make_bode_plot(f_1, Z_1, phase_1)
 
 

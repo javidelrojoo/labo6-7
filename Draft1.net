@@ -1,0 +1,11 @@
+* C:\Users\Charly\Desktop\labo6-7\Draft1.asc
+C1 N003 0 464n
+R1 0 N003 1k
+R2 N001 N002 100000k
+C2 N001 N002 5n
+R3 N002 N003 56.07
+C3 N001 0 4p
+V1 N001 0 AC 1
+.ac dec 10 20 200k
+.backanno
+.end
