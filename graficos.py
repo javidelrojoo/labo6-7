@@ -290,17 +290,38 @@ plt.savefig('graficos/impedancia-en-corto.png', dpi=400)
 plt.show()
 
 #########################
-#FIGURA 11
+#FIGURA 12 (La 11 es del circuito)
 #########################
 
+from PySpice.Spice.Netlist import Circuit
+
+def sim_circuito(R1, C1, R2, C2, R3, C3):
+    circuit = Circuit('AC Analysis')
+
+    circuit.V(1, 'n001', circuit.gnd, 'AC 1')
+    circuit.R(1, circuit.gnd, 'n003', R1)
+    circuit.C(1, 'n003', circuit.gnd, C1)
+    circuit.R(2, 'n001', 'n002', R2)
+    circuit.C(2, 'n001', 'n002', C2)
+    circuit.R(3, 'n002', 'n003', R3)
+    circuit.C(3, 'n001', circuit.gnd, C3)
+
+    # Add simulation parameters
+    simulation = circuit.simulator()
+    analysis = simulation.ac(start_frequency=20, stop_frequency=200e3, number_of_points=20, variation='dec')
+    f = np.array(analysis.frequency)
+    Z = np.array(analysis['n001'])/np.array(analysis['V1'])
+    return f, np.abs(Z), np.angle(Z, deg=True)
 
 
 f, Z, phase = np.loadtxt('circuito_memristor/circuito1.csv', delimiter=',', unpack=True, skiprows=1)
+f_sim, Z_sim, phase_sim = sim_circuito(10.31e6, 464e-9, 13.05e3, 449e-9, 56.07, 4e-12)
 
 f_err = 0.01/100 * f
 Z_err, phase_err = Z*3/100, phase*3/100
 
 plt.errorbar(f, Z, xerr=f_err, yerr=Z_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+plt.plot(f_sim, Z_sim, 'r')
 plt.ylabel('|Z| [$\Omega$]')
 plt.xlabel('Frecuencia [Hz]')
 plt.xscale('log')
@@ -311,6 +332,7 @@ plt.show()
 
 plt.figure()
 plt.errorbar(f, phase, xerr=f_err, yerr=np.abs(phase_err), color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+plt.plot(f_sim, phase_sim-180, 'r')
 plt.ylabel('Fase [°]')
 plt.xlabel('Frecuencia [Hz]')
 plt.xscale('log')
