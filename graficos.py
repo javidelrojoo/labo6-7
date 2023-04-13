@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+from impedance.models.circuits import CustomCircuit
 
 def error_ZTD(fs, Zs, V):
     Ka = np.zeros_like(fs)
@@ -293,49 +294,123 @@ plt.show()
 #FIGURA 12 (La 11 es del circuito)
 #########################
 
-from PySpice.Spice.Netlist import Circuit
-
-def sim_circuito(R1, C1, R2, C2, R3, C3):
-    circuit = Circuit('AC Analysis')
-
-    circuit.V(1, 'n001', circuit.gnd, 'AC 1')
-    circuit.R(1, circuit.gnd, 'n003', R1)
-    circuit.C(1, 'n003', circuit.gnd, C1)
-    circuit.R(2, 'n001', 'n002', R2)
-    circuit.C(2, 'n001', 'n002', C2)
-    circuit.R(3, 'n002', 'n003', R3)
-    circuit.C(3, 'n001', circuit.gnd, C3)
-
-    # Add simulation parameters
-    simulation = circuit.simulator()
-    analysis = simulation.ac(start_frequency=20, stop_frequency=200e3, number_of_points=20, variation='dec')
-    f = np.array(analysis.frequency)
-    Z = np.array(analysis['n001'])/np.array(analysis['V1'])
-    return f, np.abs(Z), np.angle(Z, deg=True)
-
-
 f, Z, phase = np.loadtxt('circuito_memristor/circuito1.csv', delimiter=',', unpack=True, skiprows=1)
-f_sim, Z_sim, phase_sim = sim_circuito(10.31e6, 464e-9, 13.05e3, 449e-9, 56.07, 4e-12)
-
 f_err = 0.01/100 * f
 Z_err, phase_err = Z*3/100, phase*3/100
 
-plt.errorbar(f, Z, xerr=f_err, yerr=Z_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
-plt.plot(f_sim, Z_sim, 'r')
-plt.ylabel('|Z| [$\Omega$]')
-plt.xlabel('Frecuencia [Hz]')
-plt.xscale('log')
-plt.legend()
-plt.grid()
-# plt.savefig('graficos/impedancia-en-corto.png', dpi=400)
+
+circuit_str = 'p(R3-p(R1,C1)-p(R2,C2),C3)'
+# initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9, 4.54e-12]
+initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9]
+# initial_guess = [50, 1e-7, 1e3, 1e-7]
+
+circuit = CustomCircuit(circuit_str, initial_guess=initial_guess, constants={'C3':4.54e-12})
+
+Z_re = Z*np.cos(phase*np.pi/180)
+Z_im = Z*np.sin(phase*np.pi/180)
+Z = Z_re + 1j*Z_im
+
+circuit.fit(f, Z, sigma=np.hstack([Z.real*3/100, Z.imag*3/100]), absolute_sigma=True)
+print(circuit)
+Z_fit = circuit.predict(f)
+
+
+fig, axs = plt.subplots(2, 1, sharex=True)
+
+axs[0].errorbar(f, np.abs(Z)*1e-3, xerr=f_err, yerr=Z_err*1e-3, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+axs[0].plot(f, np.abs(Z_fit)*1e-3, 'r')
+axs[0].set_ylabel('Impedancia [k$\Omega$]')
+axs[0].set_xscale('log')
+axs[0].grid()
+
+axs[1].errorbar(f, np.angle(Z, deg=True), xerr=f_err, yerr=phase_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+axs[1].plot(f, np.angle(Z_fit, deg=True), 'r')
+axs[1].set_ylabel('Fase [°]')
+axs[1].set_xlabel('Frecuencia [Hz]')
+axs[1].grid()
+
+plt.tight_layout()
+plt.savefig('graficos/ajuste-circuito1.png', dpi=400)
 plt.show()
 
-plt.figure()
-plt.errorbar(f, phase, xerr=f_err, yerr=np.abs(phase_err), color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
-plt.plot(f_sim, phase_sim-180, 'r')
-plt.ylabel('Fase [°]')
-plt.xlabel('Frecuencia [Hz]')
-plt.xscale('log')
-plt.legend()
-plt.grid()
+#########################
+#FIGURA 13
+#########################
+
+f, Z, phase = np.loadtxt('circuito_memristor/circuito2.csv', delimiter=',', unpack=True, skiprows=1)
+f_err = 0.01/100 * f
+Z_err, phase_err = Z*3/100, phase*3/100
+
+
+circuit_str = 'p(R3-p(R1,C1)-p(R2,C2),C3)'
+initial_guess = [56.07, 236, 464.09e-9, 55.8, 449.95e-9]
+
+circuit = CustomCircuit(circuit_str, initial_guess=initial_guess, constants={'C3':4.54e-12})
+
+Z_re = Z*np.cos(phase*np.pi/180)
+Z_im = Z*np.sin(phase*np.pi/180)
+Z = Z_re + 1j*Z_im
+
+circuit.fit(f, Z, sigma=np.hstack([Z.real*3/100, Z.imag*3/100]), absolute_sigma=True)
+print(circuit)
+Z_fit = circuit.predict(f)
+
+
+fig, axs = plt.subplots(2, 1, sharex=True)
+
+axs[0].errorbar(f, np.abs(Z), xerr=f_err, yerr=Z_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+axs[0].plot(f, np.abs(Z_fit), 'r')
+axs[0].set_ylabel('Impedancia [$\Omega$]')
+axs[0].set_xscale('log')
+axs[0].grid()
+
+axs[1].errorbar(f, np.angle(Z, deg=True), xerr=f_err, yerr=phase_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+axs[1].plot(f, np.angle(Z_fit, deg=True), 'r')
+axs[1].set_ylabel('Fase [°]')
+axs[1].set_xlabel('Frecuencia [Hz]')
+axs[1].grid()
+
+plt.tight_layout()
+plt.savefig('graficos/ajuste-circuito2.png', dpi=400)
+plt.show()
+
+#########################
+#FIGURA 14
+#########################
+
+f, Z, phase = np.loadtxt('circuito_memristor/circuito3.csv', delimiter=',', unpack=True, skiprows=1)
+f_err = 0.01/100 * f
+Z_err, phase_err = Z*3/100, phase*3/100
+
+
+circuit_str = 'p(R3-p(R1,C1)-p(R2,C2),C3)'
+initial_guess = [56.07, 1.7e3, 464.09e-9, 112.4e3, 449.95e-9]
+
+circuit = CustomCircuit(circuit_str, initial_guess=initial_guess, constants={'C3':4.54e-12})
+
+Z_re = Z*np.cos(phase*np.pi/180)
+Z_im = Z*np.sin(phase*np.pi/180)
+Z = Z_re + 1j*Z_im
+
+circuit.fit(f, Z, sigma=np.hstack([Z.real*3/100, Z.imag*3/100]), absolute_sigma=True)
+print(circuit)
+Z_fit = circuit.predict(f)
+
+
+fig, axs = plt.subplots(2, 1, sharex=True)
+
+axs[0].errorbar(f, np.abs(Z)*1e-3, xerr=f_err, yerr=Z_err*1e-3, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+axs[0].plot(f, np.abs(Z_fit)*1e-3, 'r')
+axs[0].set_ylabel('Impedancia [k$\Omega$]')
+axs[0].set_xscale('log')
+axs[0].grid()
+
+axs[1].errorbar(f, np.angle(Z, deg=True), xerr=f_err, yerr=phase_err, color='C0', linestyle='None', marker='o', capsize=5, markevery=15, errorevery=15, label='Datos')
+axs[1].plot(f, np.angle(Z_fit, deg=True), 'r')
+axs[1].set_ylabel('Fase [°]')
+axs[1].set_xlabel('Frecuencia [Hz]')
+axs[1].grid()
+
+plt.tight_layout()
+plt.savefig('graficos/ajuste-circuito3.png', dpi=400)
 plt.show()
