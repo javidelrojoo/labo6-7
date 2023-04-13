@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from impedance.models.circuits import CustomCircuit
+from impedance_grapher import bode_plot
 
 def error_ZTD(fs, Zs, V):
     Ka = np.zeros_like(fs)
@@ -414,3 +415,7 @@ axs[1].grid()
 plt.tight_layout()
 plt.savefig('graficos/ajuste-circuito3.png', dpi=400)
 plt.show()
+
+#########################
+#FIGURA 15
+#########################

@@ -76,23 +76,34 @@ class TH283X:
         meas_A, meas_B, *_ = result.split(',')
         return float(meas_A), float(meas_B)
     
-    def make_EI(self, frecs, func):
+    def make_EI(self, frecs = None, func='ZTD', fast = True):
+        if fast:
+            print('Se medirá con las frecuencias en las que el LCR puede medir y no con las frecuencias pedidas.')
+            frecs = np.unique(np.loadtxt('Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
         n = len(frecs)
         Z = np.zeros(n)
         phase = np.zeros(n)
-        f = np.zeros(n)
+        if not fast:
+            f = np.zeros(n)
         fig, axs = plt.subplots(2, 1, sharex=True)
         pbar = tqdm(frecs)
         for i, frec in enumerate(pbar):
             self.set_freq(frec)
             Z[i], phase[i] = self.measure(func)
-            f[i] = self.get_freq()
-            pbar.set_description(f'{f[i]} Hz')
             axs[0].clear()
             axs[1].clear()
-            self.make_bode_plot(f[:i], Z[:i], phase[:i], new_fig=False, axs=axs)
+            if not fast:
+                f[i] = self.get_freq()
+                pbar.set_description(f'{f[i]} Hz')
+                self.make_bode_plot(f[:i], Z[:i], phase[:i], new_fig=False, axs=axs)
+            else:
+                pbar.set_description(f'{frecs[i]} Hz')
+                self.make_bode_plot(frecs[:i], Z[:i], phase[:i], new_fig=False, axs=axs)
             plt.pause(.001)
-        return f, Z, phase
+        if fast:
+            return frecs, Z, phase
+        else:
+            return f, Z, phase
     
     def make_bode_plot(self, f, Z, phase, new_fig=True, axs=None):
         if new_fig:
