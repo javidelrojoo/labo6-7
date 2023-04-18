@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from impedance.models.circuits import CustomCircuit
 from impedance_grapher import bode_plot
+import os
 
 def error_ZTD(fs, Zs, V):
     Ka = np.zeros_like(fs)
@@ -419,3 +420,8 @@ plt.show()
 #########################
 #FIGURA 15
 #########################
+
+for filename in os.listdir('probe-station')[2:3]:
+    f, Z, phase = np.loadtxt('probe-station/' + filename, delimiter=',', unpack=True, skiprows=1)
+    print(filename)
+    bode_plot(f, Z*1e-3, phase, ylabel1='Impedancia [k$\Omega$]', savefig='graficos/bode-85-Au-Au-(C2-D1)-400mV.png')
