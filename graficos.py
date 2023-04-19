@@ -418,10 +418,45 @@ plt.savefig('graficos/ajuste-circuito3.png', dpi=400)
 plt.show()
 
 #########################
-#FIGURA 15
+#FIGURA 17, 18, 19, 20
 #########################
 
 for filename in os.listdir('probe-station')[2:3]:
     f, Z, phase = np.loadtxt('probe-station/' + filename, delimiter=',', unpack=True, skiprows=1)
     print(filename)
     bode_plot(f, Z*1e-3, phase, ylabel1='Impedancia [k$\Omega$]', savefig='graficos/bode-85-Au-Au-(C2-D1)-400mV.png')
+
+
+#########################
+#FIGURA 22
+#########################
+
+for filename in os.listdir('K2612B/results/'):
+    t, V, I = np.loadtxt('K2612B/results/' + filename, delimiter=',', unpack=True, skiprows=2)
+    plt.plot(V, I, '-o')
+    plt.title(filename)
+    plt.grid()
+    plt.show()
+
+def lineal(x, a, b):
+    return x*a + b
+
+t, V, I = np.loadtxt('K2612B/results/prueba-resistencia14k.csv', delimiter=',', unpack=True, skiprows=2)
+
+Verr = V*8/1000
+Ierr = np.array([i*45/1000 if i>90e-9 else i*430/1000 for i in I])
+
+popt, pcov = curve_fit(lineal, V, I, sigma=Ierr, absolute_sigma=True)
+
+R = 1/popt[0]
+Rerr = np.sqrt(np.sqrt(np.diag(pcov))[0]**2/R**4)
+print(f'R = {popt[0]} +/- ')
+
+plt.errorbar(V, I*1e6, xerr=Verr, yerr=Ierr*1e6, fmt='o', capsize=2, label='Datos')
+plt.plot(V, lineal(V, *popt)*1e6, 'r', zorder=3, label='Ajuste')
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Corriente [$\mu$A]')
+plt.grid()
+plt.legend()
+plt.savefig('graficos/SMU-prueba-resistencia14k.png', dpi=400)
+plt.show()
