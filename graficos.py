@@ -431,13 +431,6 @@ for filename in os.listdir('probe-station')[2:3]:
 #FIGURA 22
 #########################
 
-for filename in os.listdir('K2612B/results/'):
-    t, V, I = np.loadtxt('K2612B/results/' + filename, delimiter=',', unpack=True, skiprows=2)
-    plt.plot(V, I, '-o')
-    plt.title(filename)
-    plt.grid()
-    plt.show()
-
 def lineal(x, a, b):
     return x*a + b
 
@@ -450,7 +443,7 @@ popt, pcov = curve_fit(lineal, V, I, sigma=Ierr, absolute_sigma=True)
 
 R = 1/popt[0]
 Rerr = np.sqrt(np.sqrt(np.diag(pcov))[0]**2/R**4)
-print(f'R = {popt[0]} +/- ')
+print(f'R = {R} +/- ')
 
 plt.errorbar(V, I*1e6, xerr=Verr, yerr=Ierr*1e6, fmt='o', capsize=2, label='Datos')
 plt.plot(V, lineal(V, *popt)*1e6, 'r', zorder=3, label='Ajuste')
@@ -460,3 +453,67 @@ plt.grid()
 plt.legend()
 plt.savefig('graficos/SMU-prueba-resistencia14k.png', dpi=400)
 plt.show()
+
+#########################
+#FIGURA 23
+#########################
+
+t, V, I = np.loadtxt('K2612B/results/Al-Au(C1-D2)-ida.csv', delimiter=',', unpack=True, skiprows=2)
+plt.plot(V, np.abs(I)*1e6, '-o', label='Datos ida')
+
+t, V, I = np.loadtxt('K2612B/results/Al-Au(C1-D2)-vuelta.csv', delimiter=',', unpack=True, skiprows=2)
+plt.plot(V, np.abs(I)*1e6, '-o', label='Datos vuelta')
+
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Corriente [$\mu$A]')
+plt.grid()
+plt.legend()
+plt.savefig('graficos/SMU-Al-Au(C1-D2)-ida-vuelta.png', dpi=400)
+plt.show()
+
+#########################
+#FIGURA 24
+#########################
+
+def lineal(x, a, b):
+    return x*a + b
+
+t, V, I = np.loadtxt('K2612B/results/Au-Au(C2-D2)-ida.csv', delimiter=',', unpack=True, skiprows=2)
+
+Verr = V*8/1000
+Ierr = np.array([i*45/1000 if i>90e-9 else i*430/1000 for i in I])
+
+popt, pcov = curve_fit(lineal, V, I, sigma=Ierr, absolute_sigma=True)
+
+R = 1/popt[0]
+Rerr = np.sqrt(np.sqrt(np.diag(pcov))[0]**2/R**4)
+print(f'R = {R} +/- ')
+
+plt.errorbar(V, I*1e6, xerr=Verr, yerr=Ierr*1e6, fmt='o', capsize=2, label='Datos')
+plt.plot(V, lineal(V, *popt)*1e6, 'r', zorder=3, label='Ajuste')
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Corriente [$\mu$A]')
+plt.grid()
+plt.legend()
+plt.savefig('graficos/Au-Au(C2-D2)-ida.png', dpi=400)
+plt.show()
+
+#########################
+#FIGURA 25
+#########################
+
+t, V, I = np.loadtxt('K2612B/results/Al-Au(C2-D1)-ida.csv', delimiter=',', unpack=True, skiprows=2)
+plt.plot(V, np.abs(I)*1e6, '-o', label='Datos ida')
+
+t, V, I = np.loadtxt('K2612B/results/Al-Au(C2-D1)-vuelta.csv', delimiter=',', unpack=True, skiprows=2)
+plt.plot(V, np.abs(I)*1e6, '-o', label='Datos vuelta')
+
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Corriente [$\mu$A]')
+plt.grid()
+plt.legend()
+plt.savefig('graficos/SMU-Al-Au(C2-D1)-ida-vuelta.png', dpi=400)
+plt.show()
+
+
+
