@@ -2,12 +2,12 @@ function list_iv(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rang
 	--   list(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,limitV,nplc)
 	
 	reset()
-	smua.reset()
+	smub.reset()
 	
-	smua.nvbuffer1.clear()
-	smua.nvbuffer1.collecttimestamps = 1
-	smua.nvbuffer2.clear()
-	smua.nvbuffer2.collecttimestamps = 1
+	smub.nvbuffer1.clear()
+	smub.nvbuffer1.collecttimestamps = 1
+	smub.nvbuffer2.clear()
+	smub.nvbuffer2.collecttimestamps = 1
 	
 	format.data = format.ASCII
 	format.asciiprecision = 6
@@ -94,37 +94,37 @@ function list_iv(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rang
 	numPoints 	= count
     
 	-- gsanca 31/07/18
-	smua.source.autorangei			= smua.AUTORANGE_ON
-	--smua.source.autorangei			= smua.AUTORANGE_OFF
-	--smua.source.rangei				= limitI 
+	smub.source.autorangei			= smub.AUTORANGE_ON
+	--smub.source.autorangei			= smub.AUTORANGE_OFF
+	--smub.source.rangei				= limitI 
 	---
 	
 	-- gsanca 01/08/2018
-	smua.source.limiti				= limitI
+	smub.source.limiti				= limitI
 	
-	smua.source.leveli				= 0
+	smub.source.leveli				= 0
 	-- Set the DC bias limit.  This is not the limit used during the pulses.
-	smua.source.limitv				= 5
+	smub.source.limitv				= 5
 
 	-- Disabling Auto-Ranging and Auto-Zero ensures accurate and consistent timing
 	-- gsanca 31/07/18
-	smua.measure.autozero			= smua.AUTOZERO_AUTO
-	--smua.measure.autozero			= smua.AUTOZERO_ONCE
-	smua.measure.autorangev			= smua.AUTORANGE_OFF
-	smua.measure.rangev				= math.max(math.abs(Vpos), math.abs(Vneg))
+	smub.measure.autozero			= smub.AUTOZERO_AUTO
+	--smub.measure.autozero			= smub.AUTOZERO_ONCE
+	smub.measure.autorangev			= smub.AUTORANGE_OFF
+	smub.measure.rangev				= math.max(math.abs(Vpos), math.abs(Vneg))
 	-- gsanca 03/02/2020
-	smua.measure.rangei				= rangeI
-	smua.measure.nplc				= nplc
+	smub.measure.rangei				= rangeI
+	smub.measure.nplc				= nplc
 	-- A timer will be used to control the measure delay so set the built-in delay to 0
-	smua.measure.delay				= 0
+	smub.measure.delay				= 0
 	-- gsanca 31/07/18
-	--smua.measure.autorangei 		= 1
+	--smub.measure.autorangei 		= 1
 
 	-- Prepare the Reading Buffers
-	smua.nvbuffer1.clear()
-	smua.nvbuffer1.collecttimestamps= 1
-	smua.nvbuffer2.clear()
-	smua.nvbuffer2.collecttimestamps= 1
+	smub.nvbuffer1.clear()
+	smub.nvbuffer1.collecttimestamps= 1
+	smub.nvbuffer2.clear()
+	smub.nvbuffer2.collecttimestamps= 1
 
 	-- Configure the Trigger Model
 	--============================
@@ -135,7 +135,7 @@ function list_iv(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rang
 	trigger.timer[1].count			= numPoints > 1 and numPoints - 1 or 1
 	trigger.timer[1].delay			= pulsePeriod
 	trigger.timer[1].passthrough	= true
-	trigger.timer[1].stimulus		= smua.trigger.ARMED_EVENT_ID
+	trigger.timer[1].stimulus		= smub.trigger.ARMED_EVENT_ID
 
 	-- Timer 2 controls the measure delay
 	trigger.timer[2].count			= 1
@@ -153,31 +153,31 @@ function list_iv(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rang
     
     
 	-- Configure SMU Trigger Model for Sweep
-	--smua.trigger.source.lineari(start, stop, numPoints)
-    smua.trigger.source.listv(a)
-	smua.trigger.source.limitv		= limitV
-	smua.trigger.source.limiti		= limitI
-	smua.trigger.measure.action		= smua.ENABLE
-	smua.trigger.measure.iv(smua.nvbuffer1, smua.nvbuffer2)
-	smua.trigger.endpulse.action	= smua.SOURCE_IDLE
-	smua.trigger.endsweep.action	= smua.SOURCE_IDLE
-	smua.trigger.count				= count
-	smua.trigger.arm.count 			= armCount
-	smua.trigger.arm.stimulus		= 0
-	smua.trigger.source.stimulus	= trigger.timer[1].EVENT_ID
-	smua.trigger.measure.stimulus	= trigger.timer[2].EVENT_ID
-	smua.trigger.endpulse.stimulus	= trigger.timer[3].EVENT_ID
-	smua.trigger.source.action		= smua.ENABLE
+	--smub.trigger.source.lineari(start, stop, numPoints)
+    smub.trigger.source.listv(a)
+	smub.trigger.source.limitv		= limitV
+	smub.trigger.source.limiti		= limitI
+	smub.trigger.measure.action		= smub.ENABLE
+	smub.trigger.measure.iv(smub.nvbuffer1, smub.nvbuffer2)
+	smub.trigger.endpulse.action	= smub.SOURCE_IDLE
+	smub.trigger.endsweep.action	= smub.SOURCE_IDLE
+	smub.trigger.count				= count
+	smub.trigger.arm.count 			= armCount
+	smub.trigger.arm.stimulus		= 0
+	smub.trigger.source.stimulus	= trigger.timer[1].EVENT_ID
+	smub.trigger.measure.stimulus	= trigger.timer[2].EVENT_ID
+	smub.trigger.endpulse.stimulus	= trigger.timer[3].EVENT_ID
+	smub.trigger.source.action		= smub.ENABLE
 	--==============================
 	-- End Trigger Model Configuration
 	
-	smua.source.output				= smua.OUTPUT_ON
+	smub.source.output				= smub.OUTPUT_ON
 
 	-- Start the trigger model execution
-	smua.trigger.initiate()
+	smub.trigger.initiate()
 	-- Sweep will not start until the TRIG button is pressed
 
 	-- Wait until the sweep has completed
 	waitcomplete()
-	smua.source.output				= smua.OUTPUT_OFF
+	smub.source.output				= smub.OUTPUT_OFF
 end

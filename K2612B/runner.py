@@ -10,7 +10,7 @@ Created on Tue Jul 31 12:09:07 2018
 SCRIPT TO RUN THE listIV FUNCTION
 """
 
-
+import numpy as np
 
 def setup():
     
@@ -42,8 +42,8 @@ def setup():
     rangeV          = 20
     T               = 0.15            # Period #1s
     pw              = 0.05          # 10 ms
-    hslF            = 1              # Hysteresis switching loop flag
-    hslV            = -0.5           # Reading level
+    hslF            = 0              # Hysteresis switching loop flag
+    hslV            = 0           # Reading level
     nplc            = 0.001
     cycles          = 1
     
@@ -345,34 +345,12 @@ def IVlist_1T1R(smu,Vpos,Vneg,stepPos,stepNeg,Vgate,rev,hslV,hslF,cycles,T,pw,li
     smu.write(commandStr)
     
 #def run():
-def iv():
-    [Vpos,
-     Vneg,
-     stepPos,
-     stepNeg,
-     rev,
-     hslV,
-     hslF,
-     cycles,
-     T,
-     pw,
-     limitI,
-     limitV,
-     nplc,
-     V1,
-     V2,
-     n_1,
-     n_2,
-     v_read,
-     metaData,
-     Vgate,
-     rangeI,
-     rangeV] = setup()
-    
+def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc):
+ 
     import functions
     from time import sleep
     functions.clear_all()
-    gpibAdrress = 26
+    gpibAdrress = '0x05E6::0x2614::4103593'
     [smu,rm]    = functions.gpib(gpibAdrress)
     smu.write('reset()')
     smu.write("errorqueue.clear()")
@@ -405,8 +383,16 @@ def iv():
     
     sleep(1)
     
-    import saver
-    saver.saveME(smu,"a")
+    [t,volt,curr] = functions.readBuffer(smu, 'b')
+    t = t.strip('\n')
+    volt = volt.strip('\n')
+    curr = curr.strip('\n')
+    
+    t = np.array([float(i) for i in t.split(',')])
+    volt = np.array([float(i) for i in volt.split(',')])
+    curr = np.array([float(i) for i in curr.split(',')])
+    
+    return t, volt, curr
     
 
 def iv_1T1R():

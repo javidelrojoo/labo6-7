@@ -124,7 +124,7 @@ def save(times, readingsV, readingsI, metaData, graph):
 #------------------------------------------------------------------------------
 def caster(string):
     out = []
-    for values in string.split(','):
+    for values in string.split('\t'):
         aux = values
         out.append(float(aux))
     return out
@@ -193,7 +193,8 @@ def theFunction(smu,start, stop, points, pW, T, limitV, nplc, remote):
     """
     results = []
     header  = smu.query(command)
-    time.sleep((points+2)*T)
+    # time.sleep((points+2)*T)
+    # smu.query('*OPC?')
     while header != 'Time\tVoltage\tCurrent\n':
         header = smu.query("")
     for i in range(points):

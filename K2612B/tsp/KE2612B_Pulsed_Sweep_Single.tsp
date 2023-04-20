@@ -112,6 +112,7 @@ function PulsedSweepVSingle(start, stop, numPoints, pulseWidth, pulsePeriod, lim
 	smub.trigger.measure.stimulus	= trigger.timer[2].EVENT_ID
 	smub.trigger.endpulse.stimulus	= trigger.timer[3].EVENT_ID
 	smub.trigger.source.action		= smub.ENABLE
+	
 	--==============================
 	-- End Trigger Model Configuration
 
