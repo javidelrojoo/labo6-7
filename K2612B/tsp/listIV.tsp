@@ -100,7 +100,7 @@ function list_iv(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rang
 	---
 	
 	-- gsanca 01/08/2018
-	smub.source.limiti				= limitI
+	-- smub.source.limiti				= limitI
 	
 	smub.source.leveli				= 0
 	-- Set the DC bias limit.  This is not the limit used during the pulses.
@@ -113,12 +113,12 @@ function list_iv(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rang
 	smub.measure.autorangev			= smub.AUTORANGE_OFF
 	smub.measure.rangev				= math.max(math.abs(Vpos), math.abs(Vneg))
 	-- gsanca 03/02/2020
-	smub.measure.rangei				= rangeI
+	-- smub.measure.rangei				= rangeI
 	smub.measure.nplc				= nplc
 	-- A timer will be used to control the measure delay so set the built-in delay to 0
 	smub.measure.delay				= 0
 	-- gsanca 31/07/18
-	--smub.measure.autorangei 		= 1
+	smub.measure.autorangei 		= 1
 
 	-- Prepare the Reading Buffers
 	smub.nvbuffer1.clear()
@@ -156,7 +156,7 @@ function list_iv(Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rang
 	--smub.trigger.source.lineari(start, stop, numPoints)
     smub.trigger.source.listv(a)
 	smub.trigger.source.limitv		= limitV
-	smub.trigger.source.limiti		= limitI
+	-- smub.trigger.source.limiti		= limitI
 	smub.trigger.measure.action		= smub.ENABLE
 	smub.trigger.measure.iv(smub.nvbuffer1, smub.nvbuffer2)
 	smub.trigger.endpulse.action	= smub.SOURCE_IDLE
