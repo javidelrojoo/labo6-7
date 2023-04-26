@@ -15,6 +15,8 @@ import functions
 import runner
 import numpy as np
 import os
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
 
 def save_csv(*data, filename, root='.\\', delimiter=',', header='', rewrite=False):
     isfile = os.path.isfile(root+filename+'.csv')
@@ -37,9 +39,9 @@ functions.loadScripts(smu)
 
 # Para V= 0.4, rangeI= 5e-4
 # Para V = 0.1, rangeI = 5e-8
-N = 20
-Vpos = 5
-Vneg = 3
+N = 25
+Vpos = 0.1
+Vneg = 0.1
 stepPos = Vpos/N
 stepNeg = Vneg/N
 rev = 0
@@ -54,18 +56,28 @@ limitV = 0.5
 rangeV = 20
 nplc = 0.1
 t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc)
-save_csv(t, volt, curr, filename='Al-Au(C4-D5)-ida-vuelta-post1.5V-5-3V', root='results/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+# save_csv(t, volt, curr, filename='Al-Au(D5-D6)-alta', root='results/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
 
 
-plt.plot(volt, abs(curr), '-o')
-plt.grid()
-# plt.figure()
-# plt.plot(t[1::2], volt[1::2])
+# plt.plot(volt, abs(curr), '-o')
 # plt.grid()
-# plt.figure()
-# plt.plot(volt[1::2], abs(curr)[1::2], '-o')
-# plt.grid()
-plt.show()
+fig, ax = plt.subplots()
+
+points = np.array([volt, abs(curr)]).T.reshape(-1, 1, 2)
+segments = np.concatenate([points[:-1], points[1:]], axis=1)
+# Create a continuous norm to map from data points to colors
+norm = plt.Normalize(t.min(), t.max())
+lc = LineCollection(segments, cmap='viridis', norm=norm) #, linestyles='dashed'
+# Set the values used for colormapping
+lc.set_array(t)
+lc.set_linewidth(2)
+line = ax.add_collection(lc)
+fig.colorbar(line, ax=ax)
+ax.set_xlim(volt.min(), volt.max())
+ax.set_ylim(abs(curr).min(), abs(curr).max())
+ax.scatter(volt, abs(curr))
+ax.grid()
+ax.set_yscale('log')
 
 for filename in os.listdir('./results/'):
     if filename.startswith('Al-Au(E3-F2)-ida-vuelta'):

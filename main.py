@@ -23,7 +23,7 @@ lcr._lcr.query('FETC?')
 frecs = np.logspace(np.log10(20), np.log10(2e5), 500)
 # frecs = np.linspace(10e3, 2e5, 250)
 f, Z, phase = lcr.make_EI(frecs, 'ZTD')
-save_csv(f, Z, phase, filename='muestra-Al-Au-(41-32)-400mV', root='probe-station/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+# save_csv(f, Z, phase, filename='muestra-Al-Au-(41-32)-400mV', root='probe-station/26-4/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
 
 
 lcr.set_DC_bias_volt(0)
