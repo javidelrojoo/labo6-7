@@ -42,12 +42,14 @@ functions.loadScripts(smu)
 N = 25
 Vpos = 0.1
 Vneg = 0.1
+if Vpos > 0.1 or Vneg > 0.1:
+    input('Este voltaje probablemente escriba el dispositivo, presione ENTER para continuar')
 stepPos = Vpos/N
 stepNeg = Vneg/N
 rev = 0
 hslV = 0.3
 hslF = 0
-cycles = 1
+cycles = 2
 T = 2.5e-1
 pw = 2.5e-2
 limitI = 5e-4
@@ -56,7 +58,7 @@ limitV = 0.5
 rangeV = 20
 nplc = 0.1
 t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc)
-# save_csv(t, volt, curr, filename='Al-Au(D5-D6)-alta', root='results/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+save_csv(t, volt, curr, filename='Al-Au(B5-B6)-post-2-7V', root='results/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
 
 
 # plt.plot(volt, abs(curr), '-o')
@@ -72,12 +74,12 @@ lc = LineCollection(segments, cmap='viridis', norm=norm) #, linestyles='dashed'
 lc.set_array(t)
 lc.set_linewidth(2)
 line = ax.add_collection(lc)
-fig.colorbar(line, ax=ax)
+# fig.colorbar(line, ax=ax)
 ax.set_xlim(volt.min(), volt.max())
 ax.set_ylim(abs(curr).min(), abs(curr).max())
 ax.scatter(volt, abs(curr))
-ax.grid()
-ax.set_yscale('log')
+ax.grid(True)
+# ax.set_yscale('log')
 
 for filename in os.listdir('./results/'):
     if filename.startswith('Al-Au(E3-F2)-ida-vuelta'):
