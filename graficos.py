@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from impedance.models.circuits import CustomCircuit
 from impedance_grapher import bode_plot
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
 import os
 
 def error_ZTD(fs, Zs, V):
@@ -515,5 +517,26 @@ plt.legend()
 plt.savefig('graficos/SMU-Al-Au(C2-D1)-ida-vuelta.png', dpi=400)
 plt.show()
 
+#########################
+#FIGURA ?
+#########################
 
+t, V, I = np.loadtxt('K2612B/results/Al-Au(F1-F2)-baja.csv', delimiter=',', unpack=True, skiprows=2)
 
+fig, ax = plt.subplots()
+
+points = np.array([V, abs(I)]).T.reshape(-1, 1, 2)
+segments = np.concatenate([points[:-1], points[1:]], axis=1)
+# Create a continuous norm to map from data points to colors
+norm = plt.Normalize(t.min(), t.max())
+lc = LineCollection(segments, cmap='cool', norm=norm) #, linestyles='dashed'
+# Set the values used for colormapping
+lc.set_array(t)
+lc.set_linewidth(2)
+line = ax.add_collection(lc)
+fig.colorbar(line, ax=ax, label='Tiempo [s]')
+ax.set_xlim(V.min()*1.1, V.max()*1.1)
+ax.set_ylim(abs(I).min()*0.7, abs(I).max()*1.5)
+ax.scatter(V, abs(I), label='Datos ida', c=t, cmap='cool')
+ax.grid()
+ax.set_yscale('log')
