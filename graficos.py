@@ -518,10 +518,10 @@ plt.savefig('graficos/SMU-Al-Au(C2-D1)-ida-vuelta.png', dpi=400)
 plt.show()
 
 #########################
-#FIGURA ?
+#FIGURA 28
 #########################
 
-t, V, I = np.loadtxt('K2612B/results/Al-Au(F1-F2)-baja.csv', delimiter=',', unpack=True, skiprows=2)
+t, V, I = np.loadtxt('Keithley K2612B/results/Al-Au(F1-F2)-baja.csv', delimiter=',', unpack=True, skiprows=2)
 
 fig, ax = plt.subplots()
 
@@ -535,8 +535,58 @@ lc.set_array(t)
 lc.set_linewidth(2)
 line = ax.add_collection(lc)
 fig.colorbar(line, ax=ax, label='Tiempo [s]')
+ax.set_xlabel('Voltaje [V]')
+ax.set_ylabel('Corriente [A]')
 ax.set_xlim(V.min()*1.1, V.max()*1.1)
 ax.set_ylim(abs(I).min()*0.7, abs(I).max()*1.5)
 ax.scatter(V, abs(I), label='Datos ida', c=t, cmap='cool')
 ax.grid()
 ax.set_yscale('log')
+plt.savefig('graficos/Al-Au(F1-F2)-baja.png', dpi=400)
+plt.show()
+
+#########################
+#FIGURA 29
+#########################
+dir = 'Tonghui TH283X/results/probe-station/26-4/'
+for filename in os.listdir(dir):
+    frec, Z, phase = np.loadtxt(dir + filename, delimiter=',', unpack=True, skiprows=1)
+
+    Z_re = Z * np.cos(phase*np.pi/180)
+    Z_im = Z * np.sin(phase*np.pi/180)
+    plt.title(filename)
+    plt.scatter(Z_re*1e-3, Z_im*1e-3, c=frec, cmap='cool')
+    plt.xlabel('Re(Z) [k$\Omega$]')
+    plt.ylabel('Im(Z) [k$\Omega$]')
+    plt.colorbar()
+    plt.grid()
+    plt.figure()
+    plt.title(filename)
+    plt.plot(frec, Z*1e-3, 'o')
+    plt.xscale('log')
+    plt.xlabel('Frecuencia [Hz]')
+    plt.ylabel('Impedancia [k$\Omega$]')
+    plt.grid()
+    plt.show()
+
+fig, ax = plt.subplots()
+
+points = np.array([V, abs(I)]).T.reshape(-1, 1, 2)
+segments = np.concatenate([points[:-1], points[1:]], axis=1)
+# Create a continuous norm to map from data points to colors
+norm = plt.Normalize(t.min(), t.max())
+lc = LineCollection(segments, cmap='cool', norm=norm) #, linestyles='dashed'
+# Set the values used for colormapping
+lc.set_array(t)
+lc.set_linewidth(2)
+line = ax.add_collection(lc)
+fig.colorbar(line, ax=ax, label='Tiempo [s]')
+ax.set_xlabel('Voltaje [V]')
+ax.set_ylabel('Corriente [A]')
+ax.set_xlim(V.min()*1.1, V.max()*1.1)
+ax.set_ylim(abs(I).min()*0.7, abs(I).max()*1.5)
+ax.scatter(V, abs(I), label='Datos ida', c=t, cmap='cool')
+ax.grid()
+ax.set_yscale('log')
+# plt.savefig('graficos/Al-Au(F1-F2)-baja.png', dpi=400)
+plt.show()
