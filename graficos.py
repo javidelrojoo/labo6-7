@@ -4,7 +4,7 @@ from scipy.optimize import curve_fit
 from impedance.models.circuits import CustomCircuit
 from impedance_grapher import bode_plot
 from matplotlib.collections import LineCollection
-from matplotlib.colors import ListedColormap, BoundaryNorm
+from matplotlib.colors import ListedColormap, BoundaryNorm, LogNorm
 import os
 
 def error_ZTD(fs, Zs, V):
@@ -554,19 +554,19 @@ for filename in os.listdir(dir):
 
     Z_re = Z * np.cos(phase*np.pi/180)
     Z_im = Z * np.sin(phase*np.pi/180)
-    plt.title(filename)
-    plt.scatter(Z_re*1e-3, Z_im*1e-3, c=frec, cmap='cool')
+    plt.scatter(Z_re*1e-3, Z_im*1e-3, c=frec, cmap='cool', norm=LogNorm())
     plt.xlabel('Re(Z) [k$\Omega$]')
     plt.ylabel('Im(Z) [k$\Omega$]')
-    plt.colorbar()
+    plt.colorbar(label='Frecuencia [Hz]')
     plt.grid()
-    plt.figure()
-    plt.title(filename)
-    plt.plot(frec, Z*1e-3, 'o')
-    plt.xscale('log')
-    plt.xlabel('Frecuencia [Hz]')
-    plt.ylabel('Impedancia [k$\Omega$]')
-    plt.grid()
+    # plt.figure()
+    # plt.title(filename)
+    # plt.plot(frec, Z*1e-3, 'o')
+    # plt.xscale('log')
+    # plt.xlabel('Frecuencia [Hz]')
+    # plt.ylabel('Impedancia [k$\Omega$]')
+    # plt.grid()
+    plt.savefig('graficos/26-4 ' + filename.split('.csv')[0] + '.png', dpi=400)
     plt.show()
 
 fig, ax = plt.subplots()
