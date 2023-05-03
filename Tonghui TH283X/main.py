@@ -5,6 +5,7 @@ from save_csv import save_csv
 from tqdm import tqdm
 from TonghuiTH283X import TH283X
 import time
+import math
 
 lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 
@@ -20,10 +21,14 @@ lcr._lcr.query('*OPC?')
 lcr._lcr.write('*OPC')
 lcr._lcr.query('FETC?')
 
-frecs = np.logspace(np.log10(20), np.log10(2e5), 500)
+lcr.make_corr_open()
+
+frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
+frecs = frecs[::4]
+# frecs = np.logspace(np.log10(20), np.log10(2e5), 500)
 # frecs = np.linspace(10e3, 2e5, 250)
-f, Z, phase = lcr.make_EI(frecs, 'ZTD')
-save_csv(f, Z, phase, filename='Al-Au-(E7-E8)-400mV-2', root='probe-station/26-4/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
+save_csv(f, Z, phase, filename='80-sincorreccion-probe', root='results/resistencia/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
 
 
 lcr.set_DC_bias_volt(0)

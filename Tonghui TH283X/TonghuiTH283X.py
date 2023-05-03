@@ -79,7 +79,7 @@ class TH283X:
     def make_EI(self, frecs = None, func='ZTD', fast = True):
         if fast:
             print('Se medirá con las frecuencias en las que el LCR puede medir y no con las frecuencias pedidas.')
-            frecs = np.unique(np.loadtxt('Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
+            frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
         n = len(frecs)
         Z = np.zeros(n)
         phase = np.zeros(n)
@@ -137,12 +137,16 @@ class TH283X:
     def set_DC_bias_off(self):
         self._lcr.write('BIAS:STAT OFF')
     
-    def make_corr_open(self, min_frec, max_frec, log=True):
-        if log:
-            frecs = np.logspace(np.log10(min_frec), np.log10(max_frec), 201)
-        else:
-            frecs = np.linspace(min_frec, max_frec, 201)
-        for i in tqdm(range(1, 202)):
+    def make_corr_open(self): # min_frec, max_frec, log=True):
+        self._lcr.write('CORR:OPEN:STAT ON')
+        # if log:
+        #     frecs = np.logspace(np.log10(min_frec), np.log10(max_frec), 201)
+        # else:
+        #     frecs = np.linspace(min_frec, max_frec, 201)
+        frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
+        frecs = frecs[::4]
+        for i in tqdm(range(1, len(frecs)+1)):
+            self._lcr.write(f'CORR:SPOT {i}:STAT ON')
             self._lcr.write(f'CORR:SPOT {i}:FREQ {round(frecs[i-1], 3)}')
             self._lcr.write(f'CORR:SPOT {i}:OPEN')
             while int(self._lcr.query('*STB?')) & 0x01:
