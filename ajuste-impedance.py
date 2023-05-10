@@ -3,13 +3,17 @@ from impedance.models.circuits import CustomCircuit
 import matplotlib.pyplot as plt
 import numpy as np
 
+path = 'Tonghui TH283X/results/probe-station/26-4/'
+filename = 'Al-Au-(C5-C6)-400mV'
 # f, Z, phase = np.loadtxt('circuito_memristor/circuito1.csv', delimiter=',', unpack=True, skiprows=1)
-f, Z, phase = np.loadtxt('Tonghui TH283X/results/probe-station/26-4/Al-Au-(C5-C6)-400mV.csv', delimiter=',', unpack=True, skiprows=1)
-f_err = 0.01/100 * f
-Z_err, phase_err = Z*3/100, phase*3/100
+f, Z, phase = np.loadtxt(f'{path}{filename}.csv', delimiter=',', unpack=True, skiprows=1)
+# f_err = 0.01/100 * f
+# Z_err, phase_err = Z*3/100, phase*3/100
 
 
 circuit_str = 'p(R3-p(R1,C1)-p(R2,C2),C3)'
+# circuit_str = ''
+
 # initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9, 4.54e-12]
 initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9]
 # initial_guess = [50, 1e-7, 1e3, 1e-7]
@@ -20,7 +24,7 @@ Z_re = Z*np.cos(phase*np.pi/180)
 Z_im = Z*np.sin(phase*np.pi/180)
 Z = Z_re + 1j*Z_im
 
-circuit.fit(f, Z, sigma=np.hstack([Z.real*3/100, Z.imag*3/100]), absolute_sigma=True)
+circuit.fit(f, Z)
 print(circuit)
 Z_fit = circuit.predict(f)
 
