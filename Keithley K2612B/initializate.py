@@ -37,19 +37,20 @@ smu.write("errorqueue.clear()")
 functions.startSMU(smu)
 functions.loadScripts(smu)
 
+dia = '15-5'
 # Para V= 0.4, rangeI= 5e-4
 # Para V = 0.1, rangeI = 5e-8
-N = 75
-Vpos = 5
-Vneg = 5
+N = 100
+Vpos = 7
+Vneg = 7
 if Vpos > 0.1 or Vneg > 0.1:
     input('Este voltaje probablemente escriba el dispositivo, presione ENTER para continuar')
 stepPos = Vpos/N
 stepNeg = Vneg/N
 rev = 0
-hslV = 0.4
+hslV = 0.3
 hslF = 1
-cycles = 5
+cycles = 1
 T = 2.5e-1
 pw = 2.5e-2
 limitI = 5e-4
@@ -58,10 +59,22 @@ limitV = 0.5
 rangeV = 20
 nplc = 0.01
 t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc)
-save_csv(t, volt, curr, filename='Al-Au(E7-E8)-bias5-5V5ciclos', root='results/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+save_csv(t, volt, curr, filename='Al-Au(F5-F6)-bias0.3-7V-2', root=f'results/{dia}/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+
+plt.close('all')
+
+plt.figure()
+plt.scatter(volt[1:-1:2], 0.4/abs(curr)[:-1:2], c=t[:-1:2], cmap='cool')
+# plt.scatter(volt[1::2], abs(curr)[1::2], c=t[::2], cmap='cool')
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Resistencia [$\Omega$]')
+# plt.yscale('log')
+plt.colorbar(label='Tiempo [s]')
+plt.grid()
 
 
-# plt.plot(volt, abs(curr), '-o')
+# plt.figure()
+# plt.scatter(t, volt)
 # plt.grid()
 
 volt, curr = plot('d')
@@ -145,6 +158,16 @@ plt.ylabel('|Corriente| [mA]')
 plt.grid()
 plt.show()
 plt.savefig('../graficos/'+'Au-Au(E3-F2)-ida-vuelta'+'.png')
+
+
+t, V, I = np.loadtxt('results/15-5/Al-Au(F5-F6)-bias0.3-7V.csv', delimiter=',', unpack=True, skiprows=2)
+plt.figure()
+plt.scatter(V[1::2], 0.4/abs(I)[:-1:2], c=t[:-1:2], cmap='cool')
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Resistencia [$\Omega$]')
+plt.colorbar(label='Tiempo [s]')
+plt.grid()
+plt.savefig('../graficos/(15-5)Al-Au(F5-F6)-bias0.3-7V.png', dpi=400)
 
 # Esto era para barrido en una sola direccion
 # minV = 0
