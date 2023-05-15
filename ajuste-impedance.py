@@ -8,6 +8,8 @@ from scipy.optimize import curve_fit
 path = 'Tonghui TH283X/results/probe-station/26-4/'
 filename = 'Al-Au-(F1-F2)-400mV'
 
+path = 'Tonghui TH283X/results/probe-station/26-4/'
+filename = 'Al-Au-(C5-C6)-400mV'
 # f, Z, phase = np.loadtxt('circuito_memristor/circuito1.csv', delimiter=',', unpack=True, skiprows=1)
 f, Z, phase = np.loadtxt(f'{path}{filename}.csv', delimiter=',', unpack=True, skiprows=1)
 # f_err = 0.01/100 * f
@@ -16,6 +18,12 @@ f, Z, phase = np.loadtxt(f'{path}{filename}.csv', delimiter=',', unpack=True, sk
 
 # # circuit_str = 'p(R3-p(R1,C1)-p(R2,C2),C3)'
 # circuit_str = 'p(C1,R1)-R3'
+circuit_str = 'p(R3-p(R1,C1)-p(R2,C2),C3)'
+# circuit_str = ''
+
+# initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9, 4.54e-12]
+initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9]
+# initial_guess = [50, 1e-7, 1e3, 1e-7]
 
 # # initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9, 4.54e-12]
 # # initial_guess = [56.07, 10.31e6, 464.09e-9, 13.05e3, 449.95e-9]
@@ -32,7 +40,6 @@ Z = Z_re + 1j*Z_im
 # circuit.fit(f, Z, global_opt=True) #, sigma=np.hstack([Z.real*3/100, Z.imag*3/100]), absolute_sigma=True
 # print(circuit)
 # Z_fit = circuit.predict(f)
-
 
 def Z_circuit(f, C1, R1, R3):
     w = 2*np.pi*f
