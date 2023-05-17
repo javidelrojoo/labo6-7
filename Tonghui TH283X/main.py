@@ -12,8 +12,10 @@ lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 lcr.set_freq(1e3)
 lcr.get_freq()
 
-lcr.set_volt(0.4)
+lcr.set_volt(0.3)
 lcr.get_volt()
+
+lcr.set_DC_bias_volt(0)
 
 lcr.measure('ZTD')
 
@@ -23,13 +25,34 @@ lcr._lcr.query('FETC?')
 
 lcr.make_corr_open()
 
-frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
-frecs = frecs[::4]
-# frecs = np.logspace(np.log10(20), np.log10(2e5), 500)
-# frecs = np.linspace(10e3, 2e5, 250)
-f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
-save_csv(f, Z, phase, filename='80-sincorreccion-probe', root='results/resistencia/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+#%%
+dia = '17-5'
+filename = 'Al-Au(F1-F2)-3ro-level0.4'
 
+lcr.set_volt(0.4)
+for i in [0, 5, -5, 0]:
+    lcr.set_DC_bias_volt(i)
+    
+    frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
+    frecs = frecs[::2]
+    # frecs = np.logspace(np.log10(20), np.log10(2e5), 300)
+    # frecs = np.linspace(10e3, 2e5, 250)
+    f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
+    save_csv(f, Z, phase, filename = filename+f'-bias{i}-2', root='results/probe-station/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+    
+    mensaje_tel(
+    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    chat_id = '-1001926663084',
+    mensaje = f'Ya acabé con {i}V de bias'
+    )
+
+    plt.savefig(f'../graficos/{dia}/{filename}-bias{i}.png', dpi=400)
+    plt.figure()
+
+#%%
+plt.close('all')
+plt.plot(f, Z, 'o')
+plt.xscale('log')
 
 lcr.set_DC_bias_volt(0)
 lcr.set_DC_bias_off()

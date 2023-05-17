@@ -8,7 +8,7 @@ Created on Tue Jul 31 12:28:32 2018
 """
 RUN ONLY WHEN YOU TURN THE SMU ON 
 """
-
+from send_notification import mensaje_tel
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import functions
@@ -36,21 +36,21 @@ gpibAdress = '0x05E6::0x2614::4103593'
 smu.write("errorqueue.clear()")
 functions.startSMU(smu)
 functions.loadScripts(smu)
-
-dia = '15-5'
+#%%
+dia = '17-5'
 # Para V= 0.4, rangeI= 5e-4
 # Para V = 0.1, rangeI = 5e-8
-N = 100
-Vpos = 7
-Vneg = 7
-if Vpos > 0.1 or Vneg > 0.1:
-    input('Este voltaje probablemente escriba el dispositivo, presione ENTER para continuar')
+N = 50
+Vpos = 5
+Vneg = 5
+# if Vpos > 0.1 or Vneg > 0.1:
+    # input('Este voltaje probablemente escriba el dispositivo, presione ENTER para continuar')
 stepPos = Vpos/N
 stepNeg = Vneg/N
 rev = 0
 hslV = 0.3
 hslF = 1
-cycles = 1
+cycles = 3
 T = 2.5e-1
 pw = 2.5e-2
 limitI = 5e-4
@@ -59,19 +59,31 @@ limitV = 0.5
 rangeV = 20
 nplc = 0.01
 t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc)
-save_csv(t, volt, curr, filename='Al-Au(F5-F6)-bias0.3-7V-2', root=f'results/{dia}/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+filename = 'Al-Au(D5-D6)-bias0.3-5V-3ciclos'
+save_csv(t, volt, curr, filename=filename, root=f'results/{dia}/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
 
-plt.close('all')
+mensaje_tel(
+api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+chat_id = '-1001926663084',
+mensaje = 'Ya acabé'
+)
 
 plt.figure()
-plt.scatter(volt[1:-1:2], 0.4/abs(curr)[:-1:2], c=t[:-1:2], cmap='cool')
+plt.scatter(volt[1::2], 0.4/abs(curr)[::2], c=t[::2], cmap='cool')
 # plt.scatter(volt[1::2], abs(curr)[1::2], c=t[::2], cmap='cool')
+# plt.scatter(volt[1:400:2], 0.4/abs(curr)[:400:2], c='C0', label='Ciclo 1')
+# plt.scatter(volt[401:800:2], 0.4/abs(curr)[400:800:2], c='C1', label='Ciclo 2')
+# plt.scatter(volt[801:1600:2], 0.4/abs(curr)[800:1600:2], c='C2', label='Ciclo 3')
 plt.xlabel('Voltaje [V]')
 plt.ylabel('Resistencia [$\Omega$]')
 # plt.yscale('log')
+plt.legend()
 plt.colorbar(label='Tiempo [s]')
 plt.grid()
 
+plt.savefig(f'../graficos/{dia}/{filename}.png', dpi=400)
+#%%
+plt.close('all')
 
 # plt.figure()
 # plt.scatter(t, volt)
@@ -140,25 +152,17 @@ def plot(mode):
         ax.grid(True)
         # ax.set_yscale('log')
         return volt_d, r
-    
-for filename in os.listdir('./results/'):
-    if filename.startswith('Al-Au(E3-F2)-ida-vuelta'):
-        if filename.startswith('Al-Au(E2-F3)-ida-vuelta-bias'):
-            pass
-        else:
-            t1, volt1, curr1 = np.loadtxt('results/' + filename, delimiter=',', unpack=True, skiprows=2)
-            if volt1.max() < 0.45:
-                pass
-            else:
-                plt.plot(volt1, abs(curr1)*1000, '-o') #NOBIAS
-            # plt.plot(volt1[1::2], abs(curr1)[1::2]*1000, '-o') #BIAS
-        # plt.plot(t1[::2], abs(curr1)[::2], '-o')
-plt.xlabel('Tensión [V]')
-plt.ylabel('|Corriente| [mA]')
-plt.grid()
-plt.show()
-plt.savefig('../graficos/'+'Au-Au(E3-F2)-ida-vuelta'+'.png')
 
+for filename in os.listdir('results/15-5/'):
+    t, V, I = np.loadtxt(f'results/15-5/{filename}', delimiter=',', unpack=True, skiprows=2)
+    plt.figure()
+    plt.scatter(V[1::2], 0.4/abs(I)[:-1:2], c=t[:-1:2], cmap='cool')
+    plt.xlabel('Voltaje [V]')
+    plt.ylabel('Resistencia [$\Omega$]')
+    plt.colorbar(label='Tiempo [s]')
+    plt.grid()
+    plt.title(filename)
+    plt.show()
 
 t, V, I = np.loadtxt('results/15-5/Al-Au(F5-F6)-bias0.3-7V.csv', delimiter=',', unpack=True, skiprows=2)
 plt.figure()
