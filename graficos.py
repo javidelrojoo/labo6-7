@@ -590,3 +590,67 @@ ax.grid()
 ax.set_yscale('log')
 # plt.savefig('graficos/Al-Au(F1-F2)-baja.png', dpi=400)
 plt.show()
+
+#########################
+#FIGURA 42-inf
+#########################
+#%%
+plt.close('all')
+path = 'Tonghui TH283X/results/probe-station/17-5/'
+file = 'Al-Au(F5-F6)'
+
+# f, Z, phase = np.loadtxt(f'{path}{file}-bias0-level0.4.csv', delimiter=',', unpack=True, skiprows=1)
+f, Z, phase = np.loadtxt(f'{path}{file}-level0.4-bias0.csv', delimiter=',', unpack=True, skiprows=1)
+
+
+fig, axs = plt.subplots(4, 2, sharex=True, figsize=(12,8))
+
+axs[0][0].set_title('Bias 0V')
+axs[0][0].plot(f, np.abs(Z), 'C0')
+axs[0][0].set_ylabel('Impedancia [$\Omega$]')
+axs[0][0].set_xscale('log')
+axs[0][0].grid()
+axs[1][0].plot(f, phase, 'C1')
+axs[1][0].set_ylabel('Fase [°]')
+axs[1][0].grid()
+
+f, Z, phase = np.loadtxt(f'{path}{file}-level0.4-bias5.csv', delimiter=',', unpack=True, skiprows=1)
+
+axs[0][1].set_title('Bias 5V')
+axs[0][1].plot(f, np.abs(Z), 'C0')
+axs[0][1].set_ylabel('Impedancia [$\Omega$]')
+axs[0][1].set_xscale('log')
+axs[0][1].grid()
+axs[1][1].plot(f, phase, 'C1')
+axs[1][1].set_ylabel('Fase [°]')
+axs[1][1].grid()
+
+f, Z, phase = np.loadtxt(f'{path}{file}-level0.4-bias0-2.csv', delimiter=',', unpack=True, skiprows=1)
+
+axs[2][0].set_title('Bias 0V')
+axs[2][0].plot(f, np.abs(Z), 'C0')
+axs[2][0].set_ylabel('Impedancia [$\Omega$]')
+axs[2][0].set_xscale('log')
+axs[2][0].grid()
+axs[3][0].plot(f, phase, 'C1')
+axs[3][0].set_ylabel('Fase [°]')
+axs[3][0].grid()
+
+
+f, Z, phase = np.loadtxt(f'{path}{file}-level0.4-bias-5.csv', delimiter=',', unpack=True, skiprows=1)
+
+axs[2][1].set_title('Bias -5V')
+axs[2][1].plot(f, np.abs(Z), 'C0')
+axs[2][1].set_ylabel('Impedancia [$\Omega$]')
+axs[2][1].set_xscale('log')
+axs[2][1].grid()
+axs[3][1].plot(f, phase, 'C1')
+axs[3][1].set_ylabel('Fase [°]')
+axs[3][1].grid()
+
+axs[3][0].set_xlabel('Frecuencia [Hz]')
+axs[3][1].set_xlabel('Frecuencia [Hz]')
+
+plt.tight_layout()
+plt.savefig(f'graficos/17-5/{file}-bias.png', dpi=400)
+plt.show()
