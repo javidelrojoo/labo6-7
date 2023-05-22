@@ -345,12 +345,11 @@ def IVlist_1T1R(smu,Vpos,Vneg,stepPos,stepNeg,Vgate,rev,hslV,hslF,cycles,T,pw,li
     smu.write(commandStr)
     
 #def run():
-def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc):
+def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
  
     import functions
     from time import sleep
     functions.clear_all()
-    gpibAdrress = '0x05E6::0x2614::4103593'
     [smu,rm]    = functions.gpib(gpibAdrress)
     smu.write('reset()')
     smu.write("errorqueue.clear()")

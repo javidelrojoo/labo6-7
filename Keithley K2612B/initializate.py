@@ -8,7 +8,7 @@ Created on Tue Jul 31 12:28:32 2018
 """
 RUN ONLY WHEN YOU TURN THE SMU ON 
 """
-from send_notification import mensaje_tel
+# from send_notification import mensaje_tel
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import functions
@@ -17,6 +17,7 @@ import numpy as np
 import os
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
+
 
 def save_csv(*data, filename, root='.\\', delimiter=',', header='', rewrite=False):
     isfile = os.path.isfile(root+filename+'.csv')
@@ -29,28 +30,28 @@ def save_csv(*data, filename, root='.\\', delimiter=',', header='', rewrite=Fals
     return
 
 
-
+#%%
 functions.clear_all()
-gpibAdress = '0x05E6::0x2614::4103593'
+gpibAdress = '0x05E6::0x2612::4370543'
 [smu,rm]   = functions.gpib(gpibAdress)
 smu.write("errorqueue.clear()")
 functions.startSMU(smu)
 functions.loadScripts(smu)
 #%%
-dia = '17-5'
+dia = '22-5'
 # Para V= 0.4, rangeI= 5e-4
 # Para V = 0.1, rangeI = 5e-8
-N = 50
-Vpos = 5
-Vneg = 5
+N = 100
+Vpos = 7
+Vneg = 7
 # if Vpos > 0.1 or Vneg > 0.1:
     # input('Este voltaje probablemente escriba el dispositivo, presione ENTER para continuar')
 stepPos = Vpos/N
 stepNeg = Vneg/N
 rev = 0
-hslV = 0.3
+hslV = 0.4
 hslF = 1
-cycles = 3
+cycles = 2
 T = 2.5e-1
 pw = 2.5e-2
 limitI = 5e-4
@@ -58,8 +59,8 @@ rangeI = 1e-8
 limitV = 0.5
 rangeV = 20
 nplc = 0.01
-t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc)
-filename = 'Al-Au(D5-D6)-bias0.3-5V-3ciclos'
+t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
+filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
 save_csv(t, volt, curr, filename=filename, root=f'results/{dia}/', delimiter=',', header=f'Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
 
 mensaje_tel(
@@ -69,16 +70,18 @@ mensaje = 'Ya acabé'
 )
 
 plt.figure()
-plt.scatter(volt[1::2], 0.4/abs(curr)[::2], c=t[::2], cmap='cool')
-# plt.scatter(volt[1::2], abs(curr)[1::2], c=t[::2], cmap='cool')
-# plt.scatter(volt[1:400:2], 0.4/abs(curr)[:400:2], c='C0', label='Ciclo 1')
-# plt.scatter(volt[401:800:2], 0.4/abs(curr)[400:800:2], c='C1', label='Ciclo 2')
+# plt.scatter(volt[1::2], hslV/abs(curr[::2]), c=t[::2], cmap='cool')
+# plt.scatter(volt[1::2], abs(curr)[1::2], c=t[:-1:2], cmap='cool')
+# plt.scatter(t[800:1595:2], volt[800:1595:2])
+# plt.plot(volt, 'o')
+plt.scatter(volt[1:799:2], 0.4/abs(curr)[:798:2], c='C0', label='Ciclo 1')
+plt.scatter(volt[800:1595:2], 0.4/abs(curr)[801:1597:2], c='C1', label='Ciclo 2')
 # plt.scatter(volt[801:1600:2], 0.4/abs(curr)[800:1600:2], c='C2', label='Ciclo 3')
 plt.xlabel('Voltaje [V]')
 plt.ylabel('Resistencia [$\Omega$]')
-# plt.yscale('log')
+plt.yscale('log')
 plt.legend()
-plt.colorbar(label='Tiempo [s]')
+# plt.colorbar(label='Tiempo [s]')
 plt.grid()
 
 plt.savefig(f'../graficos/{dia}/{filename}.png', dpi=400)
