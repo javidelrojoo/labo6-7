@@ -38,7 +38,7 @@ for i,bias in enumerate([0, 1, 3, 5, 0, -1, -3, -5, 0]):
     # frecs = np.logspace(np.log10(20), np.log10(2e5), 300)
     # frecs = np.linspace(10e3, 2e5, 250)
     f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
-    save_csv(f, Z, phase, filename = filename+f'-{i}-bias{bias}', root='results/probe-station/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+    save_csv(f, Z, phase, filename = filename+f'-{i}-bias{bias}', root=f'../results/Tonghui/{dia}/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
     
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
