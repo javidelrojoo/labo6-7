@@ -114,7 +114,7 @@ class TH283X:
         axs[0].set_xscale('log')
         axs[0].grid()
 
-        axs[1].plot(f, np.abs(phase), 'C1')
+        axs[1].plot(f, phase, 'C1')
         axs[1].set_ylabel('Fase [°]')
         axs[1].set_xlabel('Frecuencia [Hz]')
         axs[1].grid()

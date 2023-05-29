@@ -6,6 +6,7 @@ from tqdm import tqdm
 from TonghuiTH283X import TH283X
 import time
 import math
+import os
 
 lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 #%%
@@ -26,29 +27,37 @@ lcr._lcr.query('FETC?')
 lcr.make_corr_open()
 
 #%%
-dia = '22-5'
-filename = 'Al-Au(F1-F2)-level0.4'
-
+dia = '29-5'
+filename = 'Al-Au(D5-D6)-level0.4-pol-neg'
+#%%
+os.mkdir(f'../results/Tonghui/{dia}')
+os.mkdir(f'../graficos/{dia}')
+#%%
 lcr.set_volt(0.4)
-for i,bias in enumerate([0, 1, 3, 5, 0, -1, -3, -5, 0]):
+bias_list = [0, -3, -5, -3, 0]
+
+
+frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
+frecs = frecs[::2]
+frecs = frecs[87:]
+# frecs = np.logspace(np.log10(20), np.log10(2e5), 300)
+# frecs = np.linspace(10e3, 2e5, 250)
+
+for i,bias in enumerate(bias_list):
     lcr.set_DC_bias_volt(bias)
-    
-    frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
-    frecs = frecs[::2]
-    # frecs = np.logspace(np.log10(20), np.log10(2e5), 300)
-    # frecs = np.linspace(10e3, 2e5, 250)
     f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
     save_csv(f, Z, phase, filename = filename+f'-{i}-bias{bias}', root=f'../results/Tonghui/{dia}/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
     
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
     chat_id = '-1001926663084',
-    mensaje = f'{i} - Ya acabé con {bias}V de bias'
+    mensaje = f'{i+1}/{len(bias_list)} - Ya acabé con {bias}V de bias'
     )
 
     plt.savefig(f'../graficos/{dia}/{filename}-{i}-bias{bias}.png', dpi=400)
     plt.figure()
 
+lcr.set_DC_bias_volt(0)
 #%%
 plt.close('all')
 plt.plot(f, Z, 'o')
