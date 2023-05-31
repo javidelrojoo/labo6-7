@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-from impedance.models.circuits import CustomCircuit
-from impedance_grapher import bode_plot
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm, LogNorm
 import os
-
+#%%
+from impedance.models.circuits import CustomCircuit
+from impedance_grapher import bode_plot
+#%%
 def error_ZTD(fs, Zs, V):
     Ka = np.zeros_like(fs)
     Kb = np.zeros_like(fs)
@@ -592,7 +593,7 @@ ax.set_yscale('log')
 plt.show()
 
 #########################
-#FIGURA 42-inf
+#FIGURA 42-47
 #########################
 #%%
 plt.close('all')
@@ -654,3 +655,36 @@ axs[3][1].set_xlabel('Frecuencia [Hz]')
 plt.tight_layout()
 plt.savefig(f'graficos/17-5/{file}-bias.png', dpi=400)
 plt.show()
+#%%
+
+plt.close('all')
+path = './results/Tonghui/29-5/'
+file = 'Al-Au(D5-D6)-level0.4'
+biases = [0, 3, 5, 3, 0]
+
+fig, axs = plt.subplots(6, 2, sharex=True, figsize=(12, 12))
+for i, bias in enumerate(biases):
+    f, Z, phase = np.loadtxt(f'{path}{file}-{i}-bias{bias}.csv', delimiter=',', unpack=True, skiprows=1)
+    
+    axs[i-i%2][i%2].set_title(f'{i+1} - Bias {bias}V')
+    axs[i-i%2][i%2].plot(f, Z*1e-3, 'C0')
+    axs[i-i%2][i%2].set_ylabel('Impedancia [k$\Omega$]')
+    axs[i-i%2][i%2].set_xscale('log')
+    axs[i-i%2][i%2].grid()
+    
+    axs[i-i%2+1][i%2].plot(f, phase, 'C1')
+    axs[i-i%2+1][i%2].set_ylabel('Fase [°]')
+    axs[i-i%2+1][i%2].grid()
+
+
+axs[5][0].set_xlabel('Frecuencia [Hz]')
+axs[3][1].set_xlabel('Frecuencia [Hz]')
+axs[3][1].xaxis.set_tick_params(which='both', labelbottom=True)
+axs[4][1].set_visible(False)
+axs[5][1].set_visible(False)
+
+plt.tight_layout()
+plt.savefig(f'graficos/29-5/{file}.png', dpi=400)
+plt.show()
+
+
