@@ -688,15 +688,17 @@ plt.savefig(f'graficos/29-5/{file}.png', dpi=400)
 plt.show()
 #%%
 plt.close('all')
+
+#D5-D6 BIAS 0
 # files = ['results/Tonghui/4-26/Al-Au-(D5-D6)-400mV.csv',
-#          'results/Tonghui/5-17/Al-Au(D5-D6)-bias0-level0.4.csv',
-#          'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0.csv',
-#          'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0-2.csv',
-#          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-0-bias0.csv',
-#          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-4-bias0.csv',
-#          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-0-bias0.csv',
-#          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-4-bias0.csv'
-#          ]
+#           'results/Tonghui/5-17/Al-Au(D5-D6)-bias0-level0.4.csv',
+#           'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0.csv',
+#           'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0-2.csv',
+#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-0-bias0.csv',
+#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-4-bias0.csv',
+#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-0-bias0.csv',
+#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-4-bias0.csv'
+#           ]
 
 # labels = ['26-4',
 #           '17-5',
@@ -707,18 +709,92 @@ plt.close('all')
 #           '29-5 post cycle (2)',
 #           '29-5 post neg cycle']
 
-files = ['results/Tonghui/4-26/Al-Au-(F1-F2)-400mV.csv',
+# for i, file in enumerate(files):
+#     plt.figure(1)
+#     f, Z, phase = np.loadtxt(file, delimiter=',', unpack=True, skiprows=1)
+#     plt.plot(f, Z, '--', label=f'D5-D6 {labels[i]}')
+#     plt.figure(2)
+#     plt.plot(f, phase, '--', label=f'D5-D6 {labels[i]}')
+
+#F1-F2 BIAS 0
+# files = ['results/Tonghui/4-26/Al-Au-(F1-F2)-400mV.csv',
+#           'results/Tonghui/5-17/Al-Au(F1-F2)-level0.4-bias0.csv',
+#           'results/Tonghui/5-17/Al-Au(F1-F2)-level0.4-bias0-2.csv',
+#           'results/Tonghui/5-17/Al-Au(F1-F2)-2do-level0.4-bias0.csv',
+#           'results/Tonghui/5-17/Al-Au(F1-F2)-2do-level0.4-bias0-2.csv',
+#           'results/Tonghui/5-17/Al-Au(F1-F2)-3ro-level0.4-bias0.csv',
+#           'results/Tonghui/5-17/Al-Au(F1-F2)-3ro-level0.4-bias0-2.csv',
+#           'results/Tonghui/5-29/Al-Au(F1-F2)-level0.4-0-bias0.csv',
+#           'results/Tonghui/5-29/Al-Au(F1-F2)-4puntas-level0.4-0-bias0.csv',
+#           'results/Tonghui/5-29/Al-Au(F1-F2)-4puntas-2do-level0.4-0-bias0.csv'
+#           ]
+# labels = ['26-4',
+#           '17-5',
+#           '17-5 post 1st cycle',
+#           '17-5 post 1st cycle (2)',
+#           '17-5 post 2nd cycle',
+#           '17-5 post 2nd cycle (2)',
+#           '17-5 post 3rd cycle',
+#           '29-5 2t',
+#           '29-5 4t',
+#           '29-5 4t (2)'
+#           ]
+
+# for i, file in enumerate(files):
+#     plt.figure(1)
+#     f, Z, phase = np.loadtxt(file, delimiter=',', unpack=True, skiprows=1)
+#     plt.plot(f, Z, label=f'F1-F2 {labels[i]}')
+#     plt.figure(2)
+#     plt.plot(f, phase, label=f'F1-F2 {labels[i]}')
+
+#F5-F6 BIAS 0
+# files = ['results/Tonghui/4-26/Al-Au-(F5-F6)-400mV.csv',
+#          'results/Tonghui/5-17/Al-Au(F5-F6)-level0.4-bias0.csv',
+#          'results/Tonghui/5-17/Al-Au(F5-F6)-level0.4-bias0-2.csv'
+#          ]
+# labels = ['26-4',
+#           '17-5',
+#           '17-5 post cycle'
+#           ]
+
+#BIAS 5V
+# files = ['results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias5.csv',
+#          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-2-bias5.csv',
+#          'results/Tonghui/5-17/Al-Au(F1-F2)-level0.4-bias5.csv',
+#          'results/Tonghui/5-17/Al-Au(F1-F2)-2do-level0.4-bias5.csv',
+#          'results/Tonghui/5-17/Al-Au(F1-F2)-3ro-level0.4-bias5.csv',
+#          'results/Tonghui/5-17/Al-Au(F5-F6)-level0.4-bias5.csv'
+#          ]
+# labels = ['D5-D6 (17-5)',
+#           'D5-D6 (29-5)',
+#           'F1-F2 1st cycle',
+#           'F1-F2 2nd cycle',
+#           'F1-F2 3rd cycle',
+#           'F5-F6']
+
+files = ['results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias-5.csv',
+         'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-2-bias-5.csv',
+         'results/Tonghui/5-17/Al-Au(F1-F2)-level0.4-bias-5.csv',
+         'results/Tonghui/5-17/Al-Au(F1-F2)-2do-level0.4-bias-5.csv',
+         'results/Tonghui/5-17/Al-Au(F1-F2)-3ro-level0.4-bias-5.csv',
+         'results/Tonghui/5-17/Al-Au(F5-F6)-level0.4-bias-5.csv'
          ]
-labels = ['26-4',
-          ]
+labels = ['D5-D6 (17-5)',
+          'D5-D6 (29-5)',
+          'F1-F2 1st cycle',
+          'F1-F2 2nd cycle',
+          'F1-F2 3rd cycle',
+          'F5-F6']
+
 
 for i, file in enumerate(files):
     plt.figure(1)
     f, Z, phase = np.loadtxt(file, delimiter=',', unpack=True, skiprows=1)
-    plt.plot(f, Z, label=labels[i])
+    plt.plot(f, Z, label=f'{labels[i]}')
     plt.figure(2)
-    plt.plot(f, phase, label=labels[i])
-    
+    plt.plot(f, phase, label=f'{labels[i]}')
+
+
 plt.figure(1)
 plt.xlabel('Frecuencia [Hz]')
 plt.ylabel('Impedancia [$\Omega$]')
