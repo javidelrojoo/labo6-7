@@ -46,7 +46,7 @@ frecs = frecs[87:]
 for i,bias in enumerate(bias_list):
     lcr.set_DC_bias_volt(bias)
     f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
-    save_csv(f, Z, phase, filename = filename+f'-{i}-bias{bias}', root=f'../results/Tonghui/{dia}/', delimiter=',', header='Frecuencia [Hz], Z [Ohm], Fase [°]')
+    save_csv(f, Z, phase, filename = filename+f'-{i}-bias{bias}', root=f'../results/Tonghui/{dia}/', delimiter=',', header='{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [°]')
     
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
