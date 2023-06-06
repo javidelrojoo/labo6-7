@@ -690,24 +690,24 @@ plt.show()
 plt.close('all')
 
 #D5-D6 BIAS 0
-# files = ['results/Tonghui/4-26/Al-Au-(D5-D6)-400mV.csv',
-#           'results/Tonghui/5-17/Al-Au(D5-D6)-bias0-level0.4.csv',
-#           'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0.csv',
-#           'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0-2.csv',
-#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-0-bias0.csv',
-#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-4-bias0.csv',
-#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-0-bias0.csv',
-#           'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-4-bias0.csv'
-#           ]
+files = ['results/Tonghui/4-26/Al-Au-(D5-D6)-400mV.csv',
+          'results/Tonghui/5-17/Al-Au(D5-D6)-bias0-level0.4.csv',
+          'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0.csv',
+          'results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias0-2.csv',
+          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-0-bias0.csv',
+          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-4-bias0.csv',
+          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-0-bias0.csv',
+          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-4-bias0.csv'
+          ]
 
-# labels = ['26-4',
-#           '17-5',
-#           '17-5 (2)',
-#           '17-5 post cycle',
-#           '29-5',
-#           '29-5 post cycle',
-#           '29-5 post cycle (2)',
-#           '29-5 post neg cycle']
+labels = ['26-4',
+          '17-5',
+          '17-5 (2)',
+          '17-5 post cycle',
+          '29-5',
+          '29-5 post cycle',
+          '29-5 post cycle (2)',
+          '29-5 post neg cycle']
 
 # for i, file in enumerate(files):
 #     plt.figure(1)
@@ -772,19 +772,20 @@ plt.close('all')
 #           'F1-F2 3rd cycle',
 #           'F5-F6']
 
-files = ['results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias-5.csv',
-         'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-2-bias-5.csv',
-         'results/Tonghui/5-17/Al-Au(F1-F2)-level0.4-bias-5.csv',
-         'results/Tonghui/5-17/Al-Au(F1-F2)-2do-level0.4-bias-5.csv',
-         'results/Tonghui/5-17/Al-Au(F1-F2)-3ro-level0.4-bias-5.csv',
-         'results/Tonghui/5-17/Al-Au(F5-F6)-level0.4-bias-5.csv'
-         ]
-labels = ['D5-D6 (17-5)',
-          'D5-D6 (29-5)',
-          'F1-F2 1st cycle',
-          'F1-F2 2nd cycle',
-          'F1-F2 3rd cycle',
-          'F5-F6']
+#BIAS -5V
+# files = ['results/Tonghui/5-17/Al-Au(D5-D6)-level0.4-bias-5.csv',
+#          'results/Tonghui/5-29/Al-Au(D5-D6)-level0.4-pol-neg-2-bias-5.csv',
+#          'results/Tonghui/5-17/Al-Au(F1-F2)-level0.4-bias-5.csv',
+#          'results/Tonghui/5-17/Al-Au(F1-F2)-2do-level0.4-bias-5.csv',
+#          'results/Tonghui/5-17/Al-Au(F1-F2)-3ro-level0.4-bias-5.csv',
+#          'results/Tonghui/5-17/Al-Au(F5-F6)-level0.4-bias-5.csv'
+#          ]
+# labels = ['D5-D6 (17-5)',
+#           'D5-D6 (29-5)',
+#           'F1-F2 1st cycle',
+#           'F1-F2 2nd cycle',
+#           'F1-F2 3rd cycle',
+#           'F5-F6']
 
 
 for i, file in enumerate(files):
@@ -798,9 +799,12 @@ for i, file in enumerate(files):
 plt.figure(1)
 plt.xlabel('Frecuencia [Hz]')
 plt.ylabel('Impedancia [$\Omega$]')
+plt.yscale('log')
 plt.xscale('log')
 plt.legend()
 plt.grid()
+plt.savefig('graficos/6-5/complation-D5-D6-bias0-Z.png', dpi=400)
+# plt.show()
 
 plt.figure(2)
 plt.xlabel('Frecuencia [Hz]')
@@ -808,5 +812,5 @@ plt.ylabel('Fase [°]')
 plt.xscale('log')
 plt.legend()
 plt.grid()
-
+plt.savefig('graficos/6-5/complation-D5-D6-bias0-f.png', dpi=400)
 plt.show()
