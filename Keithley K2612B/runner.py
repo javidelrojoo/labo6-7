@@ -392,6 +392,63 @@ def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,lim
     curr = np.array([float(i) for i in curr.split(',')])
     
     return t, volt, curr
+
+def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
+ 
+    import functions
+    from time import sleep
+    functions.clear_all()
+    [smu,rm]    = functions.gpib(gpibAdrress)
+    smu.write('reset()')
+    smu.write("errorqueue.clear()")
+    functions.initBuffers(smu)
+    [uu,complete_date,uu] = functions.date_time_now()
+    print(str(complete_date))
+    print("Start measuring...")
+    paramsStr =     (str(V)      + "," +
+                    str(N)       + "," +
+                    str(cycles)     + "," +
+                    str(T)          + "," +
+                    str(pw)         + "," +
+                    str(limitI)     + "," +
+                    str(rangeI)     + "," +
+                    str(limitV)     + "," +
+                    str(rangeV)     + "," +
+                    str(nplc))
+
+    commandStr = "stress(" + paramsStr + ")" 
+    smu.write(commandStr)
+    
+    #IVlist(smu,top,step,rev,hslV,hslF,cycles,T,pw,limitI,limitV,nplc)
+    pulses      = N  
+    testTime    = T*pulses*cycles
+    oneMinute   = testTime/60
+    import datetime
+    minutes     = datetime.timedelta(seconds=testTime)
+    if oneMinute < 1:
+        print("This will take.. less than a minute")
+    else:
+        print("This will take.. " + str(minutes))
+    sleep(1)
+    sleep(testTime)
+    sleep(1)
+
+    [uu,complete_date,uu] = functions.date_time_now()
+    print("END measuring...")
+    print(str(complete_date))
+    
+    sleep(1)
+    
+    [volt,curr,t] = functions.readBuffer(smu, 'b')
+    t = t.strip('\n')
+    volt = volt.strip('\n')
+    curr = curr.strip('\n')
+    
+    t = np.array([float(i) for i in t.split(',')])
+    volt = np.array([float(i) for i in volt.split(',')])
+    curr = np.array([float(i) for i in curr.split(',')])
+    
+    return t, volt, curr
     
 
 def iv_1T1R():

@@ -17,7 +17,7 @@ import numpy as np
 import os
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
-
+import time
 
 def save_csv(*data, filename, root='.\\', delimiter=',', header='', rewrite=False):
     isfile = os.path.isfile(root+filename+'.csv')
@@ -32,59 +32,97 @@ def save_csv(*data, filename, root='.\\', delimiter=',', header='', rewrite=Fals
 
 #%%
 functions.clear_all()
-gpibAdress = '0x05E6::0x2612::4370543'
+gpibAdress = '0x05E6::0x2614::4103593'
 [smu,rm]   = functions.gpib(gpibAdress)
 smu.write("errorqueue.clear()")
 functions.startSMU(smu)
 functions.loadScripts(smu)
 #%%
-dia = '22-5'
+dia = '6-7'
 # Para V= 0.4, rangeI= 5e-4
 # Para V = 0.1, rangeI = 5e-8
 N = 100
-Vpos = 7
-Vneg = 7
+Vpos = -0.1
+Vneg = 0.1
 # if Vpos > 0.1 or Vneg > 0.1:
     # input('Este voltaje probablemente escriba el dispositivo, presione ENTER para continuar')
 stepPos = Vpos/N
 stepNeg = Vneg/N
 rev = 0
 hslV = 0.4
-hslF = 1
-cycles = 2
-T = 2.5e-1
-pw = 2.5e-2
+hslF = 0
+cycles = 1
+T = 1
+pw = 2.5e-3
 limitI = 5e-4
 rangeI = 1e-8
 limitV = 0.5
 rangeV = 20
-nplc = 0.01
+nplc = 0.001
+V = 0.1
 t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
-filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
-save_csv(t, volt, curr, filename=filename, root=f'../results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+# filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
+# save_csv(t, volt, curr, filename=filename, root=f'../results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
 
-mensaje_tel(
-api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-chat_id = '-1001926663084',
-mensaje = 'Ya acabé'
-)
+# mensaje_tel(
+# api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+# chat_id = '-1001926663084',
+# mensaje = 'Ya acabé'
+# )
 
 plt.figure()
 # plt.scatter(volt[1::2], hslV/abs(curr[::2]), c=t[::2], cmap='cool')
 # plt.scatter(volt[1::2], abs(curr)[1::2], c=t[:-1:2], cmap='cool')
 # plt.scatter(t[800:1595:2], volt[800:1595:2])
-# plt.plot(volt, 'o')
-plt.scatter(volt[1:799:2], 0.4/abs(curr)[:798:2], c='C0', label='Ciclo 1')
-plt.scatter(volt[800:1595:2], 0.4/abs(curr)[801:1597:2], c='C1', label='Ciclo 2')
+plt.plot(t, volt, 'o')
+# plt.scatter(volt[1:799:2], 0.4/abs(curr)[:798:2], c='C0', label='Ciclo 1')
+# plt.scatter(volt[800:1595:2], 0.4/abs(curr)[801:1597:2], c='C1', label='Ciclo 2')
 # plt.scatter(volt[801:1600:2], 0.4/abs(curr)[800:1600:2], c='C2', label='Ciclo 3')
 plt.xlabel('Voltaje [V]')
 plt.ylabel('Resistencia [$\Omega$]')
-plt.yscale('log')
+# plt.yscale('log')
 plt.legend()
 # plt.colorbar(label='Tiempo [s]')
 plt.grid()
 
-plt.savefig(f'../graficos/{dia}/{filename}.png', dpi=400)
+# plt.savefig(f'../graficos/{dia}/{filename}.png', dpi=400)
+#%%
+
+# filename = 'Al-Au(F1-F2)'
+filename = 'resistencia10MOhm'
+
+dia = '6-7'
+# os.mkdir(f'../results/Keithley/{dia}/')
+# V = 0.1
+N = 100
+cycles = 1
+T = 1
+pw = 2.5e-3
+limitI = 5e-4
+rangeI = 1e-8
+limitV = 0.5
+rangeV = 20
+nplc = 0.01
+
+for V in [5]:
+
+    t, volt, curr = runner.stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
+    save_csv(t, volt, curr, filename=f'{filename}-stress-{V}V 10', root=f'../results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n V={V}, N={N}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+    
+    mensaje_tel(
+    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    chat_id = '-1001926663084',
+    mensaje = f'Ya acabé con {V}V'
+    )
+
+    plt.figure()
+    plt.plot(t, curr, 'o', label=f'{V}V')
+    plt.xlabel('Tiempo [s]')
+    plt.ylabel('Corriente [A]')
+    # plt.yscale('log')
+    plt.legend()
+    # plt.colorbar(label='Tiempo [s]')
+plt.grid()
 #%%
 plt.close('all')
 
