@@ -421,7 +421,7 @@ def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
     
     #IVlist(smu,top,step,rev,hslV,hslF,cycles,T,pw,limitI,limitV,nplc)
     pulses      = N  
-    testTime    = T*pulses*cycles
+    testTime    = T*pulses+pw
     oneMinute   = testTime/60
     import datetime
     minutes     = datetime.timedelta(seconds=testTime)
@@ -439,7 +439,7 @@ def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
     
     sleep(1)
     
-    [volt,curr,t] = functions.readBuffer(smu, 'b')
+    [t, volt, curr] = functions.readBuffer(smu, 'b')
     t = t.strip('\n')
     volt = volt.strip('\n')
     curr = curr.strip('\n')

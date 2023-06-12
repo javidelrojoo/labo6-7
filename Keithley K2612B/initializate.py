@@ -41,7 +41,7 @@ functions.loadScripts(smu)
 dia = '6-7'
 # Para V= 0.4, rangeI= 5e-4
 # Para V = 0.1, rangeI = 5e-8
-N = 100
+N = 50
 Vpos = -0.1
 Vneg = 0.1
 # if Vpos > 0.1 or Vneg > 0.1:
@@ -88,41 +88,50 @@ plt.grid()
 # plt.savefig(f'../graficos/{dia}/{filename}.png', dpi=400)
 #%%
 
-# filename = 'Al-Au(F1-F2)'
-filename = 'resistencia10MOhm'
+filename = 'Al-Au(F1-F2)-stress'
+# num_med = ' 2'
+# filename = 'resistencia10MOhm'
 
-dia = '6-7'
+dia = '6-12'
 # os.mkdir(f'../results/Keithley/{dia}/')
+# os.mkdir(f'../graficos/{dia}/')
 # V = 0.1
-N = 100
+N = 600
 cycles = 1
 T = 1
-pw = 2.5e-3
+pw = 0.999
 limitI = 5e-4
 rangeI = 1e-8
 limitV = 0.5
 rangeV = 20
 nplc = 0.01
 
-for V in [5]:
-
+for V, num_med in zip([5, 5], ['', ' 2']):
     t, volt, curr = runner.stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
-    save_csv(t, volt, curr, filename=f'{filename}-stress-{V}V 10', root=f'../results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n V={V}, N={N}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+    save_csv(t, volt, curr, filename=f'{filename}-{V}V{num_med}', root=f'../results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n V={V}, N={N}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+    
+
+
+    plt.figure()
+    plt.plot(t, V/curr, 'o', label=f'{V}V')
+    plt.xlabel('Tiempo [s]')
+    plt.ylabel('Resistencia [$\Omega$]')
+    # plt.yscale('log')
+    plt.legend()
+    # plt.colorbar(label='Tiempo [s]')
+    plt.grid()
+    plt.savefig(f'../graficos/{dia}/{filename}-{V}V{num_med}.png', dpi=400)
     
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
     chat_id = '-1001926663084',
     mensaje = f'Ya acabé con {V}V'
     )
-
-    plt.figure()
-    plt.plot(t, curr, 'o', label=f'{V}V')
-    plt.xlabel('Tiempo [s]')
-    plt.ylabel('Corriente [A]')
-    # plt.yscale('log')
-    plt.legend()
-    # plt.colorbar(label='Tiempo [s]')
-plt.grid()
+    
+    foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+             chat_id = '-1001926663084',
+             file_opened = open(f'../graficos/{dia}/{filename}-{V}V{num_med}.png', 'rb'))
+    time.sleep(60)
 #%%
 plt.close('all')
 

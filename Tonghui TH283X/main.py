@@ -27,14 +27,14 @@ lcr._lcr.query('FETC?')
 lcr.make_corr_open()
 
 #%%
-dia = '29-5'
-filename = 'Al-Au(D5-D6)-level0.4-pol-neg'
+dia = '6-7'
+filename = 'Al-Au(C5-C6)'
 #%%
 os.mkdir(f'../results/Tonghui/{dia}')
 os.mkdir(f'../graficos/{dia}')
 #%%
 lcr.set_volt(0.4)
-bias_list = [0, -3, -5, -3, 0]
+bias_list = [0.3, 0.4, 0.5]
 
 
 frecs = np.unique(np.loadtxt('results\Caracterización\\frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
