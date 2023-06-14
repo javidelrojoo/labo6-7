@@ -97,8 +97,8 @@ function stress(V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc)
 	-- smub.trigger.source.limiti		= limitI
 	smub.trigger.measure.action		= smub.ENABLE
 	smub.trigger.measure.iv(smub.nvbuffer1, smub.nvbuffer2)
-	smub.trigger.endpulse.action	= smub.SOURCE_IDLE
-	smub.trigger.endsweep.action	= smub.SOURCE_IDLE
+	-- smub.trigger.endpulse.action	= smub.SOURCE_IDLE
+	-- smub.trigger.endsweep.action	= smub.SOURCE_IDLE
 	smub.trigger.count				= count
 	smub.trigger.arm.count 			= armCount
 	smub.trigger.arm.stimulus		= 0

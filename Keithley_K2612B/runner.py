@@ -347,7 +347,7 @@ def IVlist_1T1R(smu,Vpos,Vneg,stepPos,stepNeg,Vgate,rev,hslV,hslF,cycles,T,pw,li
 #def run():
 def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
  
-    import functions
+    import Keithley_K2612B.functions as functions
     from time import sleep
     functions.clear_all()
     [smu,rm]    = functions.gpib(gpibAdrress)
@@ -382,7 +382,7 @@ def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,lim
     
     sleep(1)
     
-    [t,volt,curr] = functions.readBuffer(smu, 'b')
+    [volt,curr,t] = functions.readBuffer(smu, 'b')
     t = t.strip('\n')
     volt = volt.strip('\n')
     curr = curr.strip('\n')
@@ -395,7 +395,7 @@ def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,lim
 
 def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
  
-    import functions
+    import Keithley_K2612B.functions as functions
     from time import sleep
     functions.clear_all()
     [smu,rm]    = functions.gpib(gpibAdrress)
@@ -438,16 +438,25 @@ def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
     print(str(complete_date))
     
     sleep(1)
+    try:
+        [volt, curr, t] = functions.readBuffer(smu, 'b')
+        t = t.strip('\n')
+        volt = volt.strip('\n')
+        curr = curr.strip('\n')
     
-    [t, volt, curr] = functions.readBuffer(smu, 'b')
-    t = t.strip('\n')
-    volt = volt.strip('\n')
-    curr = curr.strip('\n')
+        t = np.array([float(i) for i in t.split(',')])
+        volt = np.array([float(i) for i in volt.split(',')])
+        curr = np.array([float(i) for i in curr.split(',')])
+    except ValueError:
+        sleep(5)
+        [volt, curr, t] = functions.readBuffer(smu, 'b')
+        t = t.strip('\n')
+        volt = volt.strip('\n')
+        curr = curr.strip('\n')
     
-    t = np.array([float(i) for i in t.split(',')])
-    volt = np.array([float(i) for i in volt.split(',')])
-    curr = np.array([float(i) for i in curr.split(',')])
-    
+        t = np.array([float(i) for i in t.split(',')])
+        volt = np.array([float(i) for i in volt.split(',')])
+        curr = np.array([float(i) for i in curr.split(',')])
     return t, volt, curr
     
 

@@ -222,7 +222,7 @@ def theFunction(smu,start, stop, points, pW, T, limitV, nplc, remote):
 #------------------------------------------------------------------------------
 def loadScripts(smu):
     scriptsInFolder = []
-    for file in [doc for doc in os.listdir(".\\tsp\\") if doc.endswith(".tsp")]:
+    for file in [doc for doc in os.listdir(".\\Keithley_K2612B\\tsp\\") if doc.endswith(".tsp")]:
         filename, file_extension = os.path.splitext(file)
         msg = "Loaded script: " + filename + file_extension
         print(msg)
@@ -236,7 +236,7 @@ def loadTSP(scriptName,smu):
     This function load the TSP scripts and send them to the k2612B 
     and run the specific script.
     """    
-    path     = ".\\tsp\\"
+    path     = ".\\Keithley_K2612B\\tsp\\"
     script   = str(scriptName)
     fileName = path + script
     #File     = open(fileName, 'r')
