@@ -86,17 +86,17 @@ functions.loadScripts(smu)
 ##################################################################
 # CICLO DE PULSOS CON KEITHLEY
 ##################################################################
-filename = 'Al-Au(D5-D6)-hsl'
+filename = 'Al-Au(C5-C6)-iv'
 
 num_med = ''
 N = 50
 Vpos = 5
-Vneg = 0.001
+Vneg = 5
 stepPos = Vpos/N
-stepNeg = 10
+stepNeg = Vneg/N
 rev = 0
 hslV = 0.4
-hslF = 1
+hslF = 0
 cycles = 1
 # T = 1
 # pw = 2.5e-3
@@ -106,22 +106,24 @@ limitV = 0.5
 rangeV = 20
 nplc = 0.001
 
-for i,T in enumerate([4, 8]):
+for i,T in enumerate([10e-2]):
     pw = T/2
     t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
     # filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
     save_csv(t, volt, curr, filename=f'{filename}-{T}s-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
-
+    
+    # t, volt, curr = np.loadtxt('results/Keithley/6-21/Al-Au(C5-C6)-hsl-0.125s-.csv', delimiter=',', unpack=True, skiprows=3)
     plt.figure()
-    plt.scatter(volt[1::2], hslV/abs(curr[::2]), c=t[::2], cmap='cool')
-    # plt.scatter(volt[1::2], abs(curr)[1::2], c=t[:-1:2], cmap='cool')
+    # plt.scatter(volt[1::2], hslV/abs(curr[::2]), c=t[::2], cmap='cool')
+    plt.scatter(volt, curr, c=t, cmap='cool')
     # plt.scatter(t[800:1595:2], volt[800:1595:2])
     # plt.plot(t, volt, 'o')
     # plt.scatter(volt[1:799:2], 0.4/abs(curr)[:798:2], c='C0', label='Ciclo 1')
     # plt.scatter(volt[800:1595:2], 0.4/abs(curr)[801:1597:2], c='C1', label='Ciclo 2')
     # plt.scatter(volt[801:1600:2], 0.4/abs(curr)[800:1600:2], c='C2', label='Ciclo 3')
     plt.xlabel('Voltaje [V]')
-    plt.ylabel('Resistencia [$\Omega$]')
+    # plt.ylabel('Resistencia [$\Omega$]')
+    plt.ylabel('Corriente [A]')
     # plt.yscale('log')
     plt.legend()
     plt.colorbar(label='Tiempo [s]')
