@@ -12,7 +12,7 @@ from send_notification import mensaje_tel, foto_tel
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '6-14'
+dia = '6-21'
 filename = 'Al-Au(C5-C6)'
 #%%
 ##################################################################
@@ -93,7 +93,7 @@ N = 50
 Vpos = 5
 Vneg = 0.001
 stepPos = Vpos/N
-stepNeg = Vneg/N
+stepNeg = 10
 rev = 0
 hslV = 0.4
 hslF = 1
@@ -106,7 +106,7 @@ limitV = 0.5
 rangeV = 20
 nplc = 0.001
 
-for i,T in enumerate([0.25, 0.5, 1, 2, 4]):
+for i,T in enumerate([4, 8]):
     pw = T/2
     t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
     # filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
@@ -124,7 +124,7 @@ for i,T in enumerate([0.25, 0.5, 1, 2, 4]):
     plt.ylabel('Resistencia [$\Omega$]')
     # plt.yscale('log')
     plt.legend()
-    # plt.colorbar(label='Tiempo [s]')
+    plt.colorbar(label='Tiempo [s]')
     plt.grid()
     plt.savefig(f'./graficos/{dia}/{filename}-{T}s-{num_med}.png', dpi=400)
     
@@ -141,7 +141,7 @@ for i,T in enumerate([0.25, 0.5, 1, 2, 4]):
 ##################################################################
 # STRESS CON KEITHLEY (CODIGO RECICLADO DEL PULSO)
 ##################################################################
-filename = 'Al-Au(D5-D6)-stress'
+filename = 'Al-Au(F1-F2)-stress'
 
 N = 200
 cycles = 1
@@ -153,9 +153,8 @@ limitV = 0.5
 rangeV = 20
 nplc = 0.01
 
-for V, num_med in zip([5, 0.4], [' 3', '']):
+for V, num_med in zip([5], [' 2']):
     t, volt, curr = runner.stress(smu, V, N, cycles, T, pw, limitI, rangeI, limitV, rangeV, nplc, gpibAdress)
-    num_med = ' 3'
     save_csv(t, volt, curr, filename=f'{filename}-{V}V{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n V={V}, N={N}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
     
     plt.figure()

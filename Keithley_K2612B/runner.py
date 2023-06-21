@@ -382,7 +382,7 @@ def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,lim
     
     sleep(1)
     
-    [volt,curr,t] = functions.readBuffer(smu, 'b')
+    [t, volt,curr] = functions.readBuffer(smu, 'b')
     t = t.strip('\n')
     volt = volt.strip('\n')
     curr = curr.strip('\n')
@@ -439,7 +439,7 @@ def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
     
     sleep(1)
     try:
-        [volt, curr, t] = functions.readBuffer(smu, 'b')
+        [t, volt, curr] = functions.readBuffer(smu, 'b')
         t = t.strip('\n')
         volt = volt.strip('\n')
         curr = curr.strip('\n')
@@ -449,7 +449,7 @@ def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
         curr = np.array([float(i) for i in curr.split(',')])
     except ValueError:
         sleep(5)
-        [volt, curr, t] = functions.readBuffer(smu, 'b')
+        [t, volt, curr] = functions.readBuffer(smu, 'b')
         t = t.strip('\n')
         volt = volt.strip('\n')
         curr = curr.strip('\n')
