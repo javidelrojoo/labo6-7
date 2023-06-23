@@ -5,6 +5,8 @@ import numpy as np
 class K2612B:
     def __init__(self, name):
         self._smu = pyvisa.ResourceManager().open_resource(name)
+        self._smu.write('smub.reset()')
+        self._smu.write('display.screen = display.SMUB')
         print(self._smu.query("*IDN?"))
     
     def __del__(self):
@@ -12,11 +14,13 @@ class K2612B:
     
     def DC_volt(self, V, time_interval, total_time):
         # Configuración del SMU
-        self._smu.write('smub.measure.func = smu.FUNC_DC_CURRENT')  # Configurar el modo de medición a voltaje DC
-        self._smu.write('smub.source.channel = smu.CHANNEL_B')  # Seleccionar la fuente B
-        self._smu.write('smub.source.func = smu.FUNC_DC_VOLTAGE')  # Configurar el modo de generación de voltaje a voltaje DC
+        self._smu.write('display.measure.func = display.MEASURE_DCAMPS')  # Configurar el modo de medición a corriente
+        self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
         self._smu.write(f'smub.source.levelv = {V}')  # Establecer el voltaje de salida deseado
-
+        self._smu.write('smub.source.output = smub.OUTPUT_ON')
+        self._smu.write('smub.measure.autorangei = smub.AUTORANGE_ON')
+        self._smu.write('smub.measure.autorangev = smub.AUTORANGE_ON')
+        
         start_time = time.time()
         t = []
         volt = []
@@ -24,8 +28,8 @@ class K2612B:
         while True:
             # Realizar una medición
             t.append(time.time() - start_time)
-            volt.append(float(self._smu.query('smub.measure.v()')))
-            curr.append(float(self._smu.query('smub.measure.i()')))
+            volt.append(float(self._smu.query('print(smub.measure.v())')))
+            curr.append(float(self._smu.query('print(smub.measure.i())')))
 
             # Verificar si se ha alcanzado la duración total de la medición
             if t[-1] >= total_time:
