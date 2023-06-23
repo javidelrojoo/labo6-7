@@ -252,20 +252,33 @@ def loadTSP(scriptName,smu):
 #------------------------------------------------------------------------------
     
 def readBuffer(smu, whichSMU):
-    
-    if whichSMU == "a":
-        curr    = smu.query('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1)')
-        volt    = smu.query('printbuffer(1, smua.nvbuffer2.n, smua.nvbuffer2)')
-        time    = smu.query('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1.timestamps)')
-    
-    else:    
-        curr    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1)')
-        volt    = smu.query('printbuffer(1, smub.nvbuffer2.n, smub.nvbuffer2)')
-        time    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1.timestamps)')
-    
+    try:
+        if whichSMU == "a":
+            curr    = smu.query('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1)')
+            volt    = smu.query('printbuffer(1, smua.nvbuffer2.n, smua.nvbuffer2)')
+            time    = smu.query('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1.timestamps)')
         
+        else:    
+            curr    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1)')
+            volt    = smu.query('printbuffer(1, smub.nvbuffer2.n, smub.nvbuffer2)')
+            time    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1.timestamps)')
+    except ValueError:
+        time.sleep(1)
+        readBuffer(smu, whichSMU)
+    
+    
+    t = time.strip('\n')
+    volt = volt.strip('\n')
+    curr = curr.strip('\n')
+    
+    t = np.array([float(i) for i in t.split(',')])
+    volt = np.array([float(i) for i in volt.split(',')])
+    curr = np.array([float(i) for i in curr.split(',')])
+    
+    while t != np.sort(t):
+        curr, t, volt = t, volt, curr
         
-    return time,volt,curr  
+    return t,volt,curr  
     
     
     

@@ -343,7 +343,7 @@ def IVlist_1T1R(smu,Vpos,Vneg,stepPos,stepNeg,Vgate,rev,hslV,hslF,cycles,T,pw,li
     # Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,limitV,nplc
     #commandStr = "list_iv(1,0.5,0.5,0.1,0,0.2,0,1,0.1,0.01,0.03,10,0.001)"
     smu.write(commandStr)
-    
+
 #def run():
 def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
  
@@ -364,7 +364,7 @@ def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,lim
     else:
         m = 1
     pulses      = 2*(Vpos/stepPos) + 2*(Vneg/stepNeg)  
-    testTime    = T*pulses*m*cycles
+    testTime    = (T + pw)*pulses*m*cycles
     oneMinute   = testTime/60
     import datetime
     minutes     = datetime.timedelta(seconds=testTime)
@@ -383,13 +383,6 @@ def iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,lim
     sleep(1)
     
     [t, volt,curr] = functions.readBuffer(smu, 'b')
-    t = t.strip('\n')
-    volt = volt.strip('\n')
-    curr = curr.strip('\n')
-    
-    t = np.array([float(i) for i in t.split(',')])
-    volt = np.array([float(i) for i in volt.split(',')])
-    curr = np.array([float(i) for i in curr.split(',')])
     
     return t, volt, curr
 
@@ -421,7 +414,7 @@ def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
     
     #IVlist(smu,top,step,rev,hslV,hslF,cycles,T,pw,limitI,limitV,nplc)
     pulses      = N  
-    testTime    = T*pulses+pw
+    testTime    = (T + pw)*pulses*cycles
     oneMinute   = testTime/60
     import datetime
     minutes     = datetime.timedelta(seconds=testTime)
@@ -438,25 +431,8 @@ def stress(smu,V,N,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc,gpibAdrress):
     print(str(complete_date))
     
     sleep(1)
-    try:
-        [t, volt, curr] = functions.readBuffer(smu, 'b')
-        t = t.strip('\n')
-        volt = volt.strip('\n')
-        curr = curr.strip('\n')
-    
-        t = np.array([float(i) for i in t.split(',')])
-        volt = np.array([float(i) for i in volt.split(',')])
-        curr = np.array([float(i) for i in curr.split(',')])
-    except ValueError:
-        sleep(5)
-        [t, volt, curr] = functions.readBuffer(smu, 'b')
-        t = t.strip('\n')
-        volt = volt.strip('\n')
-        curr = curr.strip('\n')
-    
-        t = np.array([float(i) for i in t.split(',')])
-        volt = np.array([float(i) for i in volt.split(',')])
-        curr = np.array([float(i) for i in curr.split(',')])
+    [t, volt, curr] = functions.readBuffer(smu, 'b')
+
     return t, volt, curr
     
 
