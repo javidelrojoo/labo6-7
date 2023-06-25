@@ -11,8 +11,8 @@ class K2612B:
     
     def __del__(self):
         self._smu.close()
-    
-    def DC_volt(self, V, time_interval, total_time):
+
+    def stress_DC(self, V, time_interval, total_time):
         # Configuración del SMU
         self._smu.write('display.measure.func = display.MEASURE_DCAMPS')  # Configurar el modo de medición a corriente
         self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
@@ -28,8 +28,9 @@ class K2612B:
         while True:
             # Realizar una medición
             t.append(time.time() - start_time)
-            volt.append(float(self._smu.query('print(smub.measure.v())')))
-            curr.append(float(self._smu.query('print(smub.measure.i())')))
+            v, i = self._smu.query('print(smub.measure.iv())').split(',')
+            volt.append(float(v.strip('\n')))
+            curr.append(float(i.strip('\n')))
 
             # Verificar si se ha alcanzado la duración total de la medición
             if t[-1] >= total_time:
