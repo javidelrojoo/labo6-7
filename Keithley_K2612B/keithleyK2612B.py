@@ -14,7 +14,7 @@ class K2612B:
 
     def stress_DC(self, V, time_interval, total_time):
         # Configuración del SMU
-        self._smu.write('display.measure.func = display.MEASURE_DCAMPS')  # Configurar el modo de medición a corriente
+        #self._smu.write('display.measure.func = display.MEASURE_DCAMPS')  # Configurar el modo de medición a corriente
         self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
         self._smu.write(f'smub.source.levelv = {V}')  # Establecer el voltaje de salida deseado
         self._smu.write('smub.source.output = smub.OUTPUT_ON')
@@ -28,7 +28,7 @@ class K2612B:
         while True:
             # Realizar una medición
             t.append(time.time() - start_time)
-            v, i = self._smu.query('print(smub.measure.iv())').split(',')
+            v, i = self._smu.query('print(smub.measure.iv())').split('\t')
             volt.append(float(v.strip('\n')))
             curr.append(float(i.strip('\n')))
 
@@ -38,5 +38,5 @@ class K2612B:
 
             # Esperar el intervalo de tiempo antes de la siguiente medición
             time.sleep(time_interval)
-        self._smu.write('smub.source.output = smu.OUTPUT_OFF')
+        self._smu.write('smub.source.output = smub.OUTPUT_OFF')
         return np.array(t), np.array(volt), np.array(curr)

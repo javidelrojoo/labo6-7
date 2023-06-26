@@ -12,14 +12,13 @@ from send_notification import mensaje_tel, foto_tel
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '6-21'
-filename = 'Al-Au(C5-C6)'
+dia = '6-26'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
 ##################################################################
 
-# os.mkdir(f'./results/Tonghui/{dia}')
+os.mkdir(f'./results/Tonghui/{dia}')
 os.mkdir(f'./results/Keithley/{dia}')
 os.mkdir(f'./graficos/{dia}')
 #%%
@@ -48,9 +47,9 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 num_med = ' '
 V = 5 #V
 time_interval = 1 #s
-total_time = 600 #s
+total_time = 10 #s
 
-t, curr, volt = smu.DC_volt(V, time_interval, total_time)
+t, curr, volt = smu.stress_DC(V, time_interval, total_time)
 # save_csv(t, volt, curr, filename=f'{filename}{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n V={V},time_interval={time_interval},total_time={total_time}')
 
 plt.figure()
@@ -62,15 +61,15 @@ plt.legend()
 plt.grid()
 # plt.savefig(f'./graficos/{dia}/{filename}-{V}V{num_med}.png', dpi=400)
 
-mensaje_tel(
-    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-    chat_id = '-1001926663084',
-    mensaje = f'Ya acabé con {V}V'
-    )
+# mensaje_tel(
+#     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+#     chat_id = '-1001926663084',
+#     mensaje = f'Ya acabé con {V}V'
+#     )
     
-foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-         chat_id = '-1001926663084',
-         file_opened = open(f'./graficos/{dia}/{filename}-{V}V{num_med}.png', 'rb'))
+# foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+#          chat_id = '-1001926663084',
+#          file_opened = open(f'./graficos/{dia}/{filename}-{V}V{num_med}.png', 'rb'))
 #%%
 ##################################################################
 # INICIALIZAR (PARA EL CODIGO DE LA UNSAM)
@@ -89,7 +88,7 @@ functions.loadScripts(smu)
 filename = 'Al-Au(C5-C6)-iv'
 
 num_med = ''
-N = 50
+N = 1
 Vpos = 5
 Vneg = 5
 stepPos = Vpos/N
@@ -102,15 +101,15 @@ cycles = 1
 # pw = 2.5e-3
 limitI = 5e-4
 rangeI = 1e-8
-limitV = 0.5
+limitV = 5
 rangeV = 20
 nplc = 0.001
 
-for i,T in enumerate([10e-2]):
-    pw = T/2
+for i,T in enumerate([2.5e-2]):
+    pw = 8e-3
     t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
     # filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
-    save_csv(t, volt, curr, filename=f'{filename}-{T}s-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+    # save_csv(t, volt, curr, filename=f'{filename}-{T}s-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
     
     # t, volt, curr = np.loadtxt('results/Keithley/6-21/Al-Au(C5-C6)-hsl-0.125s-.csv', delimiter=',', unpack=True, skiprows=3)
     plt.figure()
@@ -128,17 +127,17 @@ for i,T in enumerate([10e-2]):
     plt.legend()
     plt.colorbar(label='Tiempo [s]')
     plt.grid()
-    plt.savefig(f'./graficos/{dia}/{filename}-{T}s-{num_med}.png', dpi=400)
+    # plt.savefig(f'./graficos/{dia}/{filename}-{T}s-{num_med}.png', dpi=400)
     
-    mensaje_tel(
-    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-    chat_id = '-1001926663084',
-    mensaje = f'{filename}{num_med}\n Ya acabé con {T}s'
-    )
-    foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-             chat_id = '-1001926663084',
-             file_opened = open(f'./graficos/{dia}/{filename}-{T}s-{num_med}.png', 'rb'))
-    time.sleep(60)
+    # mensaje_tel(
+    # api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    # chat_id = '-1001926663084',
+    # mensaje = f'{filename}{num_med}\n Ya acabé con {T}s'
+    # )
+    # foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    #          chat_id = '-1001926663084',
+    #          file_opened = open(f'./graficos/{dia}/{filename}-{T}s-{num_med}.png', 'rb'))
+    # time.sleep(60)
 #%%
 ##################################################################
 # STRESS CON KEITHLEY (CODIGO RECICLADO DEL PULSO)
@@ -183,7 +182,7 @@ for V, num_med in zip([5], [' 2']):
 ##################################################################
 # IMPORTS PARA TONGHUI
 ##################################################################
-
+plt.close('all')
 from Tonghui_TH283X.TonghuiTH283X import TH283X
 
 lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
@@ -191,21 +190,32 @@ lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 ##################################################################
 # CICLO DE BIAS CON EL TONGHUI
 ##################################################################
+filename = '85-Al-Au(F5-F6)'
 
-lcr.set_volt(0.4)
-bias_list = [0.3, 0.4, 0.5]
-
+level = 0.1
+lcr.set_volt(level)
+bias_list = [0, 0]
+level_list = [0.2, 0.3]
 
 frecs = np.unique(np.loadtxt('Tonghui_TH283X/results/Caracterización/frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
-frecs = frecs[::2]
+frecs = np.concatenate((frecs[:300:10], frecs[300:600:5], frecs[600:]))
+plt.plot(frecs, 'o')
+# plt.yscale('log')
 # frecs = frecs[87:]
 
-for i,bias in enumerate(bias_list):
+for bias,level,num_med in zip(bias_list, level_list, ['', '']):
+    lcr.set_volt(level)
+    mensaje_tel(
+    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    chat_id = '-1001926663084',
+    mensaje = f'{time.ctime()}\n{i}/{len(bias_list)} - Arranco con {bias}V de bias'
+    )
+    
     lcr.set_DC_bias_volt(bias)
     f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
-    save_csv(f, Z, phase, filename = filename+f'-{i}-bias{bias}', root=f'./results/Tonghui/{dia}/', delimiter=',', header=f'{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [°]')
+    save_csv(f, Z, phase, filename = f'{filename}-level{level}V-bias{bias}V{num_med}', root=f'./results/Tonghui/{dia}/', delimiter=',', header=f'{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [°]')
     
-    plt.savefig(f'./graficos/{dia}/{filename}-{i}-bias{bias}.png', dpi=400)
+    plt.savefig(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}.png', dpi=400)
     
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -215,8 +225,7 @@ for i,bias in enumerate(bias_list):
     
     foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
              chat_id = '-1001926663084',
-             file_opened = open(f'./graficos/{dia}/{filename}-{i}-bias{bias}.png', 'rb'))
-    
-    plt.figure()
+             file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}.png', 'rb'))
 
 lcr.set_DC_bias_volt(0)
+lcr.set_volt(0.01)
