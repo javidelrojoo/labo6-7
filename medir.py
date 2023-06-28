@@ -13,14 +13,14 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '6-26'
+dia = '6-28'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
 ##################################################################
 
 os.mkdir(f'./results/Tonghui/{dia}')
-os.mkdir(f'./results/Keithley/{dia}')
+# os.mkdir(f'./results/Keithley/{dia}')
 os.mkdir(f'./graficos/{dia}')
 #%%
 ##################################################################
@@ -191,20 +191,24 @@ lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 ##################################################################
 # CICLO DE BIAS CON EL TONGHUI
 ##################################################################
-filename = '85-Al-Au(F5-F6)'
+filename = '85-Al-Au(E5-E6)'
 
-level = 0.1
-lcr.set_volt(level)
-bias_list = [0, 0]
-level_list = [0.2, 0.3]
+# level = 0.1
+# lcr.set_volt(level)
+bias_list = [0,0]
+level_list = [0.4,0.2]
+num_meds = ['', '']
+
+if not (len(bias_list) == len(level_list) and len(level_list) == len(num_meds)):
+    input('No hay la misma cantidad de valores')
 
 frecs = np.unique(np.loadtxt('Tonghui_TH283X/results/Caracterización/frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
 frecs = np.concatenate((frecs[:300:10], frecs[300:600:5], frecs[600:]))
-plt.plot(frecs, 'o')
+# plt.plot(frecs, 'o')
 # plt.yscale('log')
 # frecs = frecs[87:]
-
-for bias,level,num_med in zip(bias_list, level_list, ['', '']):
+i = 0
+for bias,level,num_med in zip(bias_list, level_list, num_meds):
     lcr.set_volt(level)
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -212,7 +216,7 @@ for bias,level,num_med in zip(bias_list, level_list, ['', '']):
     mensaje = f'{time.ctime()}\n{i}/{len(bias_list)} - Arranco con {bias}V de bias'
     )
     
-    lcr.set_DC_bias_volt(bias)
+    # lcr.set_DC_bias_volt(bias)
     f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
     save_csv(f, Z, phase, filename = f'{filename}-level{level}V-bias{bias}V{num_med}', root=f'./results/Tonghui/{dia}/', delimiter=',', header=f'{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [deg]')
     
@@ -241,7 +245,7 @@ for bias,level,num_med in zip(bias_list, level_list, ['', '']):
     foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
              chat_id = '-1001926663084',
              file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}-nyquist.png', 'rb'))
+    i += 1
 
-
-lcr.set_DC_bias_volt(0)
+# lcr.set_DC_bias_volt(0)
 lcr.set_volt(0.01)
