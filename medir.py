@@ -7,6 +7,7 @@ import time
 import math
 import os
 from send_notification import mensaje_tel, foto_tel
+from matplotlib.colors import LogNorm
 #%%
 ##################################################################
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
@@ -213,9 +214,20 @@ for bias,level,num_med in zip(bias_list, level_list, ['', '']):
     
     lcr.set_DC_bias_volt(bias)
     f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
-    save_csv(f, Z, phase, filename = f'{filename}-level{level}V-bias{bias}V{num_med}', root=f'./results/Tonghui/{dia}/', delimiter=',', header=f'{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [°]')
+    save_csv(f, Z, phase, filename = f'{filename}-level{level}V-bias{bias}V{num_med}', root=f'./results/Tonghui/{dia}/', delimiter=',', header=f'{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [deg]')
     
     plt.savefig(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}.png', dpi=400)
+    
+    plt.figure()
+    Zre = Z*np.cos(phase*np.pi/180)
+    Zim = Z*np.sin(phase*np.pi/180)
+    plt.scatter(Zre, -Zim, c=f, cmap='cool', norm=LogNorm())
+    plt.colorbar(label='Frecuencia [Hz]')
+    plt.grid()
+    plt.xlabel('Re(Z) [$\Omega$]')
+    plt.ylabel('-Im(Z) [$\Omega$]')
+
+    plt.savefig(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}-nyquist.png', dpi=400)
     
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -226,6 +238,10 @@ for bias,level,num_med in zip(bias_list, level_list, ['', '']):
     foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
              chat_id = '-1001926663084',
              file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}.png', 'rb'))
+    foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+             chat_id = '-1001926663084',
+             file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}-nyquist.png', 'rb'))
+
 
 lcr.set_DC_bias_volt(0)
 lcr.set_volt(0.01)
