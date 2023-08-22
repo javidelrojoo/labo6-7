@@ -260,15 +260,15 @@ def readBuffer(smu, whichSMU):
             times    = smu.query('printbuffer(1, smua.nvbuffer1.n, smua.nvbuffer1.timestamps)')
         
         else:    
-            curr    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1)')
-            volt    = smu.query('printbuffer(1, smub.nvbuffer2.n, smub.nvbuffer2)')
-            times    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1.timestamps)')
+            t    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1)')
+            t2    = smu.query('printbuffer(1, smub.nvbuffer2.n, smub.nvbuffer2)')
+            volt    = smu.query('printbuffer(1, smub.nvbuffer1.n, smub.nvbuffer1.timestamps)')
     except ValueError:
         time.sleep(1)
         readBuffer(smu, whichSMU)
     
     
-    t = times.strip('\n')
+    t = t2.strip('\n')
     volt = volt.strip('\n')
     curr = curr.strip('\n')
     

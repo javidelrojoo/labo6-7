@@ -13,14 +13,14 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '6-28'
+dia = '8-22'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
 ##################################################################
 
 os.mkdir(f'./results/Tonghui/{dia}')
-# os.mkdir(f'./results/Keithley/{dia}')
+os.mkdir(f'./results/Keithley/{dia}')
 os.mkdir(f'./graficos/{dia}')
 #%%
 ##################################################################
@@ -86,60 +86,59 @@ functions.loadScripts(smu)
 ##################################################################
 # CICLO DE PULSOS CON KEITHLEY
 ##################################################################
-filename = 'Al-Au(C5-C6)-iv'
+filename = 'Al-Au(F1-F2)'
 
-num_med = ''
-N = 1
+num_med = '2'
+N = 25
 Vpos = 5
 Vneg = 5
-stepPos = Vpos/N
+stepPos = Vpos/N 
 stepNeg = Vneg/N
 rev = 0
 hslV = 0.4
-hslF = 0
-cycles = 1
-# T = 1
-# pw = 2.5e-3
-limitI = 5e-4
+hslF = 1
+cycles = 2
+T = 0.125
+pw = T/2
+limitI = 0.5
 rangeI = 1e-8
 limitV = 5
 rangeV = 20
 nplc = 0.001
 
-for i,T in enumerate([2.5e-2]):
-    pw = 8e-3
-    t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
-    # filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
-    # save_csv(t, volt, curr, filename=f'{filename}-{T}s-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
-    
-    # t, volt, curr = np.loadtxt('results/Keithley/6-21/Al-Au(C5-C6)-hsl-0.125s-.csv', delimiter=',', unpack=True, skiprows=3)
-    plt.figure()
-    # plt.scatter(volt[1::2], hslV/abs(curr[::2]), c=t[::2], cmap='cool')
-    plt.scatter(volt, curr, c=t, cmap='cool')
-    # plt.scatter(t[800:1595:2], volt[800:1595:2])
-    # plt.plot(t, volt, 'o')
-    # plt.scatter(volt[1:799:2], 0.4/abs(curr)[:798:2], c='C0', label='Ciclo 1')
-    # plt.scatter(volt[800:1595:2], 0.4/abs(curr)[801:1597:2], c='C1', label='Ciclo 2')
-    # plt.scatter(volt[801:1600:2], 0.4/abs(curr)[800:1600:2], c='C2', label='Ciclo 3')
-    plt.xlabel('Voltaje [V]')
-    # plt.ylabel('Resistencia [$\Omega$]')
-    plt.ylabel('Corriente [A]')
-    # plt.yscale('log')
-    plt.legend()
-    plt.colorbar(label='Tiempo [s]')
-    plt.grid()
-    # plt.savefig(f'./graficos/{dia}/{filename}-{T}s-{num_med}.png', dpi=400)
-    
-    # mensaje_tel(
-    # api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-    # chat_id = '-1001926663084',
-    # mensaje = f'{filename}{num_med}\n Ya acabé con {T}s'
-    # )
-    # foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-    #          chat_id = '-1001926663084',
-    #          file_opened = open(f'./graficos/{dia}/{filename}-{T}s-{num_med}.png', 'rb'))
-    # time.sleep(60)
-#%%
+t, volt, curr = runner.iv(smu,Vpos,Vneg,stepPos,stepNeg,rev,hslV,hslF,cycles,T,pw,limitI,rangeI,limitV,rangeV,nplc, gpibAdress)
+
+# filename = 'Al-Au(C5-c6)-bias0.4-7V-2ciclos'
+save_csv(t, volt, curr, filename=f'{filename}-(-{Vneg},{Vpos})-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltage [V], Corriente [A]\n Vpos={Vpos}, Vneg={Vneg}, stepPos={stepPos}, stepNeg={stepNeg}, rev={rev}, hslV={hslV}, hslF={hslF}, cycles={cycles}, T={T}, pw={pw}, limitI={limitI}, rangeI={rangeI}, limitV={limitV}, rangeV={rangeV}, nlpc={nplc}')
+
+plt.figure()
+plt.scatter(volt[1::2], hslV/abs(curr[::2]), c=t[::2], cmap='cool')
+
+# volt_rem = np.concatenate((volt[1:-1:2][:100], volt[::2][101:201], volt[1:-1:2][202:]))
+# curr_rem = np.concatenate((curr[::2][:100], curr[1:-1:2][102:201], curr[::2][202:]))
+# plt.scatter(volt_rem, hslV/abs(curr_rem), c=t[:-6:2], cmap='cool')
+
+# plt.plot(volt[1::2], hslV/abs(curr[::2]))
+# plt.scatter(volt, curr, c=t, cmap='cool')
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Resistencia [$\Omega$]')
+# plt.ylabel('Corriente [A]')
+plt.yscale('log')
+plt.colorbar(label='Tiempo [s]')
+plt.grid()
+
+plt.savefig(f'./graficos/{dia}/{filename}-(-{Vneg},{Vpos})-{num_med}.png', dpi=400)
+
+mensaje_tel(
+api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+chat_id = '-1001926663084',
+mensaje = f'{filename} Ya acabé con {T}s'
+)
+foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+          chat_id = '-1001926663084',
+          file_opened = open(f'./graficos/{dia}/{filename}-(-{Vneg},{Vpos})-{num_med}.png', 'rb'))
+
+    #%%
 ##################################################################
 # STRESS CON KEITHLEY (CODIGO RECICLADO DEL PULSO)
 ##################################################################
