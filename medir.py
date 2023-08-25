@@ -40,6 +40,46 @@ from keithley2600 import Keithley2600
 
 smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 # smu = Keithley2600('USB0::0x05E6::0x2614::4103593::INSTR')
+
+#%%
+##################################################################
+# Curva IV con nuestro codigo
+##################################################################
+filename = 'Al-Au(F1-F2)'
+
+num_med = '2'
+
+Vmax = 5
+Vmin = -5
+hslV = 0.4
+pw = 1e-3
+Npos = 50
+Nneg = Npos
+
+t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, hslV, pw, Npos, Nneg)
+save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filename}-({Vmin},{Vmax})-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo dinamica [s], Voltaje dinamica [V], Corriente dinamica [A], Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, hslV={hslV}')
+
+
+plt.figure()
+plt.scatter(volt_rem, hslV/abs(curr_rem), c=t_rem, cmap='cool')
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Resistencia [$\Omega$]')
+# plt.ylabel('Corriente [A]')
+plt.yscale('log')
+plt.colorbar(label='Tiempo [s]')
+plt.grid()
+
+plt.savefig(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-{num_med}.png', dpi=400)
+
+mensaje_tel(
+api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+chat_id = '-1001926663084',
+mensaje = f'{filename} Ya acabé con {T}s'
+)
+foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+          chat_id = '-1001926663084',
+          file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-{num_med}.png', 'rb'))
+
 #%%
 ##################################################################
 # STRESS CON KEITHLEY
