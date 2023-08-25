@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '8-22'
+dia = '8-25'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -45,41 +45,78 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 ##################################################################
 # Curva IV con nuestro codigo
 ##################################################################
-filename = 'Al-Au(F1-F2)'
+filename = '90-Al-Au(B1-B2)'
 
-num_med = '2'
+num_med = '6'
 
-Vmax = 5
-Vmin = -5
+Vmax = 7
+Vmin = -2.5
 hslV = 0.4
-pw = 1e-3
-Npos = 50
-Nneg = Npos
+pw = 0.1
+Npos = 75
+Nneg = 75
+rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
+limiti = 0.5
+rangev = 2
+cycles = 30
+T1 = 0.01
+T2 = 0.01
+nplc = 0.5
 
-t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, hslV, pw, Npos, Nneg)
-save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filename}-({Vmin},{Vmax})-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo dinamica [s], Voltaje dinamica [V], Corriente dinamica [A], Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, hslV={hslV}')
+t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, pw, Npos, Nneg, rangei, limiti, rangev, cycles, T1, T2, nplc, hslV)
 
+print(np.mean(curr_rem), np.std(curr_rem))
+
+save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filename}-({Vmin},{Vmax})-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo dinamica [s], Voltaje dinamica [V], Corriente dinamica [A], Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, cycles={cycles}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}')
 
 plt.figure()
-plt.scatter(volt_rem, hslV/abs(curr_rem), c=t_rem, cmap='cool')
+plt.scatter(volt_din, volt_rem/abs(curr_rem), c=t_rem, cmap='cool')
 plt.xlabel('Voltaje [V]')
 plt.ylabel('Resistencia [$\Omega$]')
 # plt.ylabel('Corriente [A]')
 plt.yscale('log')
 plt.colorbar(label='Tiempo [s]')
 plt.grid()
+plt.show()
 
 plt.savefig(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-{num_med}.png', dpi=400)
 
 mensaje_tel(
 api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 chat_id = '-1001926663084',
-mensaje = f'{filename} Ya acabé con {T}s'
+mensaje = f'{filename} Ya acabé'
 )
 foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
           chat_id = '-1001926663084',
           file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-{num_med}.png', 'rb'))
 
+#%%
+######################################################
+# CODIGO PARA PROBAR DISITNTOS RANGOS DE I
+######################################################
+a = np.array([])
+plt.figure()
+for i in ['auto']:
+    rangei = i    
+
+    for _ in range(50):
+        t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, pw, Npos, Nneg, rangei, limiti, rangev, hslV)
+    
+        a = np.concatenate((a, np.abs(volt_rem/curr_rem)))
+    
+    plt.hist(a, label=i)
+    
+    save_csv(a, filename=f'resistencia2.8k-rangei{i}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Resistencia medida con rangei={i} [Ohm]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, hslV={hslV}')
+    a = np.array([])
+
+for file in os.listdir(f'./results/Keithley/{dia}/'):
+    if file.startswith('resistencia2.8k'):
+        R = np.loadtxt(f'./results/Keithley/{dia}/' + file, skiprows=3, delimiter=',', unpack=True)
+        plt.hist(R, label=file[22:-4])
+        print(file[22:-4], np.std(R), np.mean(R))
+plt.legend()
+plt.xscale('log')
+plt.yscale('log')
 #%%
 ##################################################################
 # STRESS CON KEITHLEY
