@@ -1,8 +1,10 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm, LogNorm
+import matplotlib.patheffects as pe
 import os
 #%%
 from impedance.models.circuits import CustomCircuit
@@ -814,3 +816,63 @@ plt.legend()
 plt.grid()
 plt.savefig('graficos/6-5/complation-D5-D6-bias0-f.png', dpi=400)
 plt.show()
+#%%
+#########################
+#PROMEDIO 30 CICLOS
+#########################
+
+t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = np.loadtxt('./results/Keithley/8-25/90-Al-Au(B1-B2)-(-2.5,7)-6.csv', delimiter=',', unpack=True, skiprows=3)
+
+plt.plot(t_din[1:149], volt_din[1:149], '-o')
+plt.plot(t_rem[1:149], volt_rem[1:149], '-o')
+len(t_din[:149])
+
+plt.plot(t_din[149:297], volt_din[149:297], '-o')
+plt.plot(t_rem[149:297], volt_rem[149:297], '-o')
+len(t_din[149:297])
+
+plt.plot(t_din[297:445], volt_din[297:445], '-o')
+plt.plot(t_rem[297:445], volt_rem[297:445], '-o')
+
+plt.grid()
+plt.show()
+
+n = 1
+
+ciclos = []
+for i in range(30):
+    ciclos.append(curr_rem[n:n+147])
+    # plt.plot(t_din[n:n+147], volt_din[n:n+147], '-o')
+    # plt.plot(t_rem[n:n+147], volt_rem[n:n+147], '-o')
+    print(i)
+    plt.scatter(volt_din[n:n+147], abs(volt_rem[n:n+147]/curr_rem[n:n+147]), c=t_rem[n:n+147], cmap='cool')
+    plt.show()
+    n += 148
+# plt.grid()
+# plt.show()
+#17, 18
+curr_mean = np.mean(np.array(ciclos[:17] + ciclos[19:]), axis=0)
+curr_std = np.std(np.array(ciclos[:17] + ciclos[19:]), axis=0)
+
+print(min(0.4/np.abs(curr_mean)), max(0.4/np.abs(curr_mean)))
+
+
+
+plt.scatter(volt_din, abs(0.4/curr_rem), c=t_rem, cmap='cool')
+plt.colorbar(label='Tiempo [s]')
+plt.errorbar(volt_din[1:148], 0.4/np.abs(curr_mean), yerr=0.4*curr_std/curr_mean**2, fmt='-ok', capsize=3, errorevery=2, label='Promedio de ciclos')
+plt.hlines(max(0.4/np.abs(curr_mean)), -2.5, 7, linestyles='dashed', colors='red', path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()], label='HRS y LRS')
+plt.hlines(min(0.4/np.abs(curr_mean)), -2.5, 7, linestyles='dashed', colors='red', path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()])
+# plt.errorbar(volt_din[1:148], 0.4/np.abs(curr_mean), fmt='-ok', capsize=3, errorevery=2)
+plt.xlabel('Voltaje [V]')
+plt.ylabel('Resistencia [$\Omega$]')
+plt.yscale('log')
+plt.tight_layout()
+plt.grid()
+plt.ylim(top=500000)
+plt.legend()
+plt.savefig('graficos/8-25/90-Al-Au(B1-B2)-30ciclos-sinruido.png', dpi=400)
+plt.show()
+
+
+# %%
