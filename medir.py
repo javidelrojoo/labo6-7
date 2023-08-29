@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '8-25'
+dia = '8-29'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -45,12 +45,10 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 ##################################################################
 # Curva IV con nuestro codigo
 ##################################################################
-filename = '90-Al-Au(B1-B2)'
+filename = '90-Al-Au(C3-C4)'
 
-num_med = '6'
-
-Vmax = 7
-Vmin = -2.5
+Vmax = 5
+Vmin = -5
 hslV = 0.4
 pw = 0.1
 Npos = 75
@@ -58,19 +56,39 @@ Nneg = 75
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 30
+cycles = 15
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
 
 t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, pw, Npos, Nneg, rangei, limiti, rangev, cycles, T1, T2, nplc, hslV)
+# print(volt_rem/curr_rem)
 
-print(np.mean(curr_rem), np.std(curr_rem))
 
-save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filename}-({Vmin},{Vmax})-{num_med}', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo dinamica [s], Voltaje dinamica [V], Corriente dinamica [A], Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, cycles={cycles}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}')
+# n = 1
+
+# ciclos = []
+# for i in range(30):
+#     ciclos.append(curr_rem[n:n+147])
+#     # plt.plot(t_din[n:n+147], volt_din[n:n+147], '-o')
+#     # plt.plot(t_rem[n:n+147], volt_rem[n:n+147], '-o')
+#     # print(i)
+#     # plt.scatter(volt_din[n:n+147], abs(volt_rem[n:n+147]/curr_rem[n:n+147]), c=t_rem[n:n+147], cmap='cool')
+#     # plt.show()
+#     n += 148
+# # plt.grid()
+# # plt.show()
+# #17, 18
+# curr_mean = np.mean(np.array(ciclos), axis=0)
+# curr_std = np.std(np.array(ciclos), axis=0)
+
+
+hora = time.strftime("%H %M %S", time.localtime())
+save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filename}-({Vmin},{Vmax})-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo dinamica [s], Voltaje dinamica [V], Corriente dinamica [A], Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, cycles={cycles}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}')
 
 plt.figure()
 plt.scatter(volt_din, volt_rem/abs(curr_rem), c=t_rem, cmap='cool')
+# plt.errorbar(volt_din[1:148], 0.4/np.abs(curr_mean), yerr=0.4*curr_std/curr_mean**2, fmt='-ok', capsize=3, errorevery=2, label='Promedio de ciclos')
 plt.xlabel('Voltaje [V]')
 plt.ylabel('Resistencia [$\Omega$]')
 # plt.ylabel('Corriente [A]')
@@ -79,7 +97,7 @@ plt.colorbar(label='Tiempo [s]')
 plt.grid()
 plt.show()
 
-plt.savefig(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-{num_med}.png', dpi=400)
+plt.savefig(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', dpi=400)
 
 mensaje_tel(
 api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -88,7 +106,7 @@ mensaje = f'{filename} Ya acabé'
 )
 foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
           chat_id = '-1001926663084',
-          file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-{num_med}.png', 'rb'))
+          file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', 'rb'))
 
 #%%
 ######################################################
