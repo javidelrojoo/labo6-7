@@ -854,7 +854,7 @@ for i in range(30):
 curr_mean = np.mean(np.array(ciclos[:17] + ciclos[19:]), axis=0)
 curr_std = np.std(np.array(ciclos[:17] + ciclos[19:]), axis=0)
 
-print(min(0.4/np.abs(curr_mean)), max(0.4/np.abs(curr_mean)))
+100*(max(0.4/np.abs(curr_mean)) - min(0.4/np.abs(curr_mean)))/max(0.4/np.abs(curr_mean))
 
 
 
