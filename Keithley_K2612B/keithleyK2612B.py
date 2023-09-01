@@ -1,6 +1,7 @@
 import time
 import pyvisa
 import numpy as np
+from tqdm import tqdm
 
 class K2612B:
     def __init__(self, name):
@@ -41,7 +42,7 @@ class K2612B:
         
         self._smu.write(f'smub.source.levelv = 0')
         
-        for i in volt_meas:
+        for i in tqdm(volt_meas):
             
             self._smu.write(f'smub.source.levelv = {i}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
@@ -70,6 +71,45 @@ class K2612B:
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
         
         return np.array(t_din), np.array(volt_din), np.array(curr_din), np.array(t_rem), np.array(volt_rem), np.array(curr_rem)
+    
+    def custom_volt(self, volt_meas, pw, rangei, limiti, rangev, T, nplc):
+        self._smu.write(f'smub.measure.nplc = {nplc}')
+        self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
+        
+        # self._smu.write('smub.measure.autorangei = smub.AUTORANGE_OFF')
+        # self._smu.write('smub.measure.autorangev = smub.AUTORANGE_OFF')
+        # self._smu.write(f'smub.source.limiti = {limiti}')
+        # self._smu.write(f'smub.measure.rangei = {rangei}')
+        # self._smu.write(f'smub.measure.rangev = {rangev}')
+        
+        self._smu.write('smub.measure.autorangei = smub.AUTORANGE_ON')
+        self._smu.write('smub.measure.autorangev = smub.AUTORANGE_ON')
+        
+        start_time = time.time()
+        
+        t = []
+        volt = []
+        curr = []
+        self._smu.write(f'smub.source.levelv = 0')
+        
+        for i in tqdm(volt_meas):
+            
+            self._smu.write(f'smub.source.levelv = {i}')
+            self._smu.write('smub.source.output = smub.OUTPUT_ON')
+            time.sleep(pw/2)
+            t.append(time.time() - start_time)
+            i, v = self._smu.query('print(smub.measure.iv())').split('\t')
+            volt.append(float(v.strip('\n')))
+            curr.append(float(i.strip('\n')))
+            time.sleep(pw/2)
+            self._smu.write('smub.source.output = smub.OUTPUT_OFF')
+            
+            time.sleep(T)
+            
+        self._smu.write('smub.source.output = smub.OUTPUT_OFF')
+        
+        return np.array(t), np.array(volt), np.array(curr)
+    
         
     def stress_DC(self, V, time_interval, total_time):
         # Configuración del SMU

@@ -19,7 +19,7 @@ def mensaje_tel(api_token:str, chat_id: str, mensaje: str = 'Termino de correr e
     api_url = f'https://api.telegram.org/bot{api_token}/sendMessage'
     try:
         response = requests.post(api_url, json={'chat_id': chat_id, 'text': mensaje})
-        print(response.text)
+        # print(response.text)
     except Exception as e:
         print(e)
 
@@ -27,7 +27,7 @@ def foto_tel(api_token:str, chat_id: str, file_opened: str):
     params = {'chat_id': chat_id}
     files = {'photo': file_opened}
     response = requests.post(f'https://api.telegram.org/bot{api_token}/sendPhoto', params, files=files)
-    return response.text
+    return #response.text
 
 # mensaje_tel(
 # api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',

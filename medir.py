@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '8-29'
+dia = '9-1'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -43,9 +43,62 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 
 #%%
 ##################################################################
+# Voltaje custom (acumulacion de pulsos)
+##################################################################
+filename = '80-Al-Au(C3-C4)'
+
+
+volt_meas = []
+for i in np.concatenate((np.linspace(0, -5, 50, endpoint=False), [])):
+    volt_meas.append(0.4)
+    volt_meas.append(i)
+    
+volt_meas = volt_meas+[0.4]*2500
+# volt_meas = [0.4]*10
+
+pw = 0.1
+rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
+limiti = 0.5
+rangev = 2
+T = 0.01
+nplc = 0.5
+
+t, volt, curr = smu.custom_volt(volt_meas, pw, rangei, limiti, rangev, T, nplc)
+# print(0.4/curr*1e-6)
+
+
+hora = time.strftime("%H %M %S", time.localtime())
+save_csv(t, volt, curr, filename=f'{filename}-(tren-pulsos)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltaje [V], Corriente [A]\n  pw={pw}, T = {T}, nplc={nplc}')
+
+plt.figure()
+plt.scatter(volt[1::2], abs(volt/curr)[::2], c=t[::2], cmap='cool')
+plt.yscale('log')
+
+plt.figure()
+plt.plot(t[100:], (volt/curr)[100:], '-o')
+plt.xlabel('Tiempo [s]')
+plt.ylabel('Resistencia [$\Omega$]')
+# plt.ylabel('Corriente [A]')
+plt.grid()
+plt.show()
+
+plt.savefig(f'./graficos/{dia}/{filename}-(tren-pulsos)-({hora}).png', dpi=400)
+
+mensaje_tel(
+api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+chat_id = '-1001926663084',
+mensaje = f'{filename} Ya acabé'
+)
+foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+          chat_id = '-1001926663084',
+          file_opened = open(f'./graficos/{dia}/{filename}-(tren-pulsos)-({hora}).png', 'rb'))
+
+
+#%%
+##################################################################
 # Curva IV con nuestro codigo
 ##################################################################
-filename = '90-Al-Au(C3-C4)'
+filename = '80-Al-Au(C3-C4)'
 
 Vmax = 5
 Vmin = -5
@@ -56,7 +109,7 @@ Nneg = 75
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 15
+cycles = 1
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
