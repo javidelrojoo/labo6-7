@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '9-1'
+dia = '9-5'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -49,18 +49,18 @@ filename = '80-Al-Au(C3-C4)'
 
 
 volt_meas = []
-for i in np.concatenate((np.linspace(0, -5, 50, endpoint=False), [])):
+for i in np.concatenate((np.linspace(0, 6, 50, endpoint=False), [])):
     volt_meas.append(0.4)
     volt_meas.append(i)
     
-volt_meas = volt_meas+[0.4]*2500
+volt_meas = volt_meas+[0.4]*42069
 # volt_meas = [0.4]*10
 
-pw = 0.1
+pw = 0
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-T = 0.01
+T = 0
 nplc = 0.5
 
 t, volt, curr = smu.custom_volt(volt_meas, pw, rangei, limiti, rangev, T, nplc)
@@ -70,9 +70,16 @@ t, volt, curr = smu.custom_volt(volt_meas, pw, rangei, limiti, rangev, T, nplc)
 hora = time.strftime("%H %M %S", time.localtime())
 save_csv(t, volt, curr, filename=f'{filename}-(tren-pulsos)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltaje [V], Corriente [A]\n  pw={pw}, T = {T}, nplc={nplc}')
 
+mensaje_tel(
+api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+chat_id = '-1001926663084',
+mensaje = f'{filename} Ya acabé'
+)
+
 plt.figure()
-plt.scatter(volt[1::2], abs(volt/curr)[::2], c=t[::2], cmap='cool')
+plt.scatter(volt[1::2], abs(volt/curr)[:-1:2], c=t[:-1:2], cmap='cool')
 plt.yscale('log')
+plt.grid()
 
 plt.figure()
 plt.plot(t[100:], (volt/curr)[100:], '-o')
@@ -84,11 +91,7 @@ plt.show()
 
 plt.savefig(f'./graficos/{dia}/{filename}-(tren-pulsos)-({hora}).png', dpi=400)
 
-mensaje_tel(
-api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-chat_id = '-1001926663084',
-mensaje = f'{filename} Ya acabé'
-)
+
 foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
           chat_id = '-1001926663084',
           file_opened = open(f'./graficos/{dia}/{filename}-(tren-pulsos)-({hora}).png', 'rb'))
@@ -100,18 +103,18 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '80-Al-Au(C3-C4)'
 
-Vmax = 5
-Vmin = -5
+Vmax = 6
+Vmin = -2
 hslV = 0.4
-pw = 0.1
+pw = 0
 Npos = 75
 Nneg = 75
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 1
-T1 = 0.01
-T2 = 0.01
+cycles = 3
+T1 = 0
+T2 = 0
 nplc = 0.5
 
 t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, pw, Npos, Nneg, rangei, limiti, rangev, cycles, T1, T2, nplc, hslV)
@@ -338,36 +341,35 @@ lcr = TH283X('USB0::0x0471::0x2827::QF40900001::INSTR')
 ##################################################################
 # CICLO DE BIAS CON EL TONGHUI
 ##################################################################
-filename = '85-Al-Au(E5-E6)'
+filename = '80-Al-Au(C3-C4)'
 
 # level = 0.1
 # lcr.set_volt(level)
-bias_list = [0,0]
-level_list = [0.4,0.2]
-num_meds = ['', '']
+bias_list = [0]
+level_list = [0.4]
 
-if not (len(bias_list) == len(level_list) and len(level_list) == len(num_meds)):
+if not (len(bias_list) == len(level_list)):
     input('No hay la misma cantidad de valores')
 
 frecs = np.unique(np.loadtxt('Tonghui_TH283X/results/Caracterización/frecuencia-LCR.csv', delimiter=',', unpack=True, skiprows=2)[1])
-frecs = np.concatenate((frecs[:300:10], frecs[300:600:5], frecs[600:]))
+# frecs = np.concatenate((frecs[:300:10], frecs[300:600:5], frecs[600:]))
 # plt.plot(frecs, 'o')
 # plt.yscale('log')
 # frecs = frecs[87:]
 i = 0
-for bias,level,num_med in zip(bias_list, level_list, num_meds):
+for bias,level in zip(bias_list, level_list):
     lcr.set_volt(level)
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
     chat_id = '-1001926663084',
     mensaje = f'{time.ctime()}\n{i}/{len(bias_list)} - Arranco con {bias}V de bias'
     )
-    
+    hora = time.strftime("%H %M %S", time.localtime())
     # lcr.set_DC_bias_volt(bias)
     f, Z, phase = lcr.make_EI(frecs, 'ZTD', fast=False)
-    save_csv(f, Z, phase, filename = f'{filename}-level{level}V-bias{bias}V{num_med}', root=f'./results/Tonghui/{dia}/', delimiter=',', header=f'{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [deg]')
+    save_csv(f, Z, phase, filename = f'{filename}-level{level}V-bias{bias}V-({hora})', root=f'./results/Tonghui/{dia}/', delimiter=',', header=f'{time.ctime()}\n Frecuencia [Hz], Z [Ohm], Fase [deg]')
     
-    plt.savefig(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}.png', dpi=400)
+    plt.savefig(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V-({hora}).png', dpi=400)
     
     plt.figure()
     Zre = Z*np.cos(phase*np.pi/180)
@@ -378,7 +380,7 @@ for bias,level,num_med in zip(bias_list, level_list, num_meds):
     plt.xlabel('Re(Z) [$\Omega$]')
     plt.ylabel('-Im(Z) [$\Omega$]')
 
-    plt.savefig(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}-nyquist.png', dpi=400)
+    plt.savefig(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V-({hora})-nyquist.png', dpi=400)
     
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -388,10 +390,10 @@ for bias,level,num_med in zip(bias_list, level_list, num_meds):
     
     foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
              chat_id = '-1001926663084',
-             file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}.png', 'rb'))
+             file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V-({hora}).png', 'rb'))
     foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
              chat_id = '-1001926663084',
-             file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V{num_med}-nyquist.png', 'rb'))
+             file_opened = open(f'./graficos/{dia}/{filename}-level{level}V-bias{bias}V-({hora})-nyquist.png', 'rb'))
     i += 1
 
 # lcr.set_DC_bias_volt(0)
