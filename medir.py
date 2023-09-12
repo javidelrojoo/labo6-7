@@ -23,6 +23,12 @@ os.mkdir(f'./results/Tonghui/{dia}')
 os.mkdir(f'./results/Keithley/{dia}')
 os.mkdir(f'./graficos/{dia}')
 #%%
+from SiglentSDS1202X import SDS1202
+
+osci = SDS1202('USB0::0xF4ED::0xEE3A::SDS1EBBD1R5714::INSTR')
+
+t1, ch1, t2, ch2 = osci.read_data()
+#%%
 ##################################################################
 # IMPORTS PARA KEITHLEY
 ##################################################################
