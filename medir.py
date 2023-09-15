@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '9-5'
+dia = '9-15'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -23,11 +23,13 @@ os.mkdir(f'./results/Tonghui/{dia}')
 os.mkdir(f'./results/Keithley/{dia}')
 os.mkdir(f'./graficos/{dia}')
 #%%
-from SiglentSDS1202X import SDS1202
+from TektronixTDS1002B import TDS1002B
 
-osci = SDS1202('USB0::0xF4ED::0xEE3A::SDS1EBBD1R5714::INSTR')
+osci = TDS1002B('USB0::0x0699::0x0413::C012302::INSTR')
 
-t1, ch1, t2, ch2 = osci.read_data()
+t1, ch1 = osci.read_data(1)
+
+plt.plot(t1, ch1)
 #%%
 ##################################################################
 # IMPORTS PARA KEITHLEY
@@ -109,18 +111,18 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '80-Al-Au(C3-C4)'
 
-Vmax = 6
-Vmin = -2
+Vmax = 5
+Vmin = -5
 hslV = 0.4
-pw = 0
-Npos = 75
-Nneg = 75
+pw = 0.1
+Npos = 50
+Nneg = 50
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
 cycles = 3
-T1 = 0
-T2 = 0
+T1 = 0.01
+T2 = 0.01
 nplc = 0.5
 
 t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, pw, Npos, Nneg, rangei, limiti, rangev, cycles, T1, T2, nplc, hslV)
@@ -150,6 +152,7 @@ save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filen
 
 plt.figure()
 plt.scatter(volt_din, volt_rem/abs(curr_rem), c=t_rem, cmap='cool')
+# plt.scatter(volt_rem, volt_din/abs(curr_din), c=t_rem, cmap='cool')
 # plt.errorbar(volt_din[1:148], 0.4/np.abs(curr_mean), yerr=0.4*curr_std/curr_mean**2, fmt='-ok', capsize=3, errorevery=2, label='Promedio de ciclos')
 plt.xlabel('Voltaje [V]')
 plt.ylabel('Resistencia [$\Omega$]')
@@ -161,14 +164,14 @@ plt.show()
 
 plt.savefig(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', dpi=400)
 
-mensaje_tel(
-api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-chat_id = '-1001926663084',
-mensaje = f'{filename} Ya acabé'
-)
-foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-          chat_id = '-1001926663084',
-          file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', 'rb'))
+# mensaje_tel(
+# api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+# chat_id = '-1001926663084',
+# mensaje = f'{filename} Ya acabé'
+# )
+# foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+#           chat_id = '-1001926663084',
+#           file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', 'rb'))
 
 #%%
 ######################################################
