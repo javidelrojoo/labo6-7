@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '9-15'
+dia = '9-19'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -112,15 +112,15 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 filename = '80-Al-Au(C3-C4)'
 
 Vmax = 5
-Vmin = -5
+Vmin = -2
 hslV = 0.4
 pw = 0.1
-Npos = 50
-Nneg = 50
+Npos = 30
+Nneg = 30
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 3
+cycles = 5
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
