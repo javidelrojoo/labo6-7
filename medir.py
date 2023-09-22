@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '9-19'
+dia = '9-22'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -28,8 +28,14 @@ from TektronixTDS1002B import TDS1002B
 osci = TDS1002B('USB0::0x0699::0x0413::C012302::INSTR')
 
 t1, ch1 = osci.read_data(1)
+t2, ch2 = osci.read_data(2)
+
 
 plt.plot(t1, ch1)
+plt.plot(t2, ch2)
+
+save_csv(data, filename)
+
 #%%
 ##################################################################
 # IMPORTS PARA KEITHLEY
@@ -57,18 +63,18 @@ filename = '80-Al-Au(C3-C4)'
 
 
 volt_meas = []
-for i in np.concatenate((np.linspace(0, 6, 50, endpoint=False), [])):
+for i in np.concatenate((np.linspace(0, 5, 50, endpoint=False), [])):
     volt_meas.append(0.4)
     volt_meas.append(i)
     
-volt_meas = volt_meas+[0.4]*42069
+# volt_meas = volt_meas+[0.4]*42069
 # volt_meas = [0.4]*10
 
-pw = 0
+pw = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-T = 0
+T = 0.01
 nplc = 0.5
 
 t, volt, curr = smu.custom_volt(volt_meas, pw, rangei, limiti, rangev, T, nplc)
@@ -112,15 +118,15 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 filename = '80-Al-Au(C3-C4)'
 
 Vmax = 5
-Vmin = -2
+Vmin = -5
 hslV = 0.4
 pw = 0.1
-Npos = 30
-Nneg = 30
+Npos = 50
+Nneg = 50
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 5
+cycles = 1
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
