@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '9-22'
+dia = '9-26'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -63,11 +63,11 @@ filename = '80-Al-Au(C3-C4)'
 
 
 volt_meas = []
-for i in np.concatenate((np.linspace(0, 5, 50, endpoint=False), [])):
+for i in np.concatenate((np.linspace(0, 8, 50, endpoint=False), np.linspace(8, 0, 50, endpoint=False), np.linspace(0, -3, 50, endpoint=False), np.linspace(-3, 0, 50, endpoint=False))):
     volt_meas.append(0.4)
     volt_meas.append(i)
     
-# volt_meas = volt_meas+[0.4]*42069
+# volt_meas = volt_meas+[0.4]*150
 # volt_meas = [0.4]*10
 
 pw = 0.1
@@ -84,11 +84,11 @@ t, volt, curr = smu.custom_volt(volt_meas, pw, rangei, limiti, rangev, T, nplc)
 hora = time.strftime("%H %M %S", time.localtime())
 save_csv(t, volt, curr, filename=f'{filename}-(tren-pulsos)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo [s], Voltaje [V], Corriente [A]\n  pw={pw}, T = {T}, nplc={nplc}')
 
-mensaje_tel(
-api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-chat_id = '-1001926663084',
-mensaje = f'{filename} Ya acabé'
-)
+# mensaje_tel(
+# api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+# chat_id = '-1001926663084',
+# mensaje = f'{filename} Ya acabé'
+# )
 
 plt.figure()
 plt.scatter(volt[1::2], abs(volt/curr)[:-1:2], c=t[:-1:2], cmap='cool')
@@ -106,9 +106,9 @@ plt.show()
 plt.savefig(f'./graficos/{dia}/{filename}-(tren-pulsos)-({hora}).png', dpi=400)
 
 
-foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-          chat_id = '-1001926663084',
-          file_opened = open(f'./graficos/{dia}/{filename}-(tren-pulsos)-({hora}).png', 'rb'))
+# foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+#           chat_id = '-1001926663084',
+#           file_opened = open(f'./graficos/{dia}/{filename}-(tren-pulsos)-({hora}).png', 'rb'))
 
 
 #%%
@@ -117,8 +117,8 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '80-Al-Au(C3-C4)'
 
-Vmax = 5
-Vmin = -5
+Vmax = 8
+Vmin = -3
 hslV = 0.4
 pw = 0.1
 Npos = 50
@@ -170,14 +170,14 @@ plt.show()
 
 plt.savefig(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', dpi=400)
 
-# mensaje_tel(
-# api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-# chat_id = '-1001926663084',
-# mensaje = f'{filename} Ya acabé'
-# )
-# foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-#           chat_id = '-1001926663084',
-#           file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', 'rb'))
+mensaje_tel(
+api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+chat_id = '-1001926663084',
+mensaje = f'{filename} Ya acabé'
+)
+foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+          chat_id = '-1001926663084',
+          file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', 'rb'))
 
 #%%
 ######################################################
