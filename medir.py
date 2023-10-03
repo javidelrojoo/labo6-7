@@ -144,7 +144,7 @@ nplc = 0.5
 t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.autoR(V, Rth1, Rth2, rangei, limiti, rangev, cycles, pw, T1, T2, nplc, hslV)
 
 hora = time.strftime("%H %M %S", time.localtime())
-save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V})-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Rht1={Rth1}, Rth2={Rth2}, pw={pw}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, pulsos hasta umbral={len(volt_din)}')
+save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Rht1={Rth1}, Rth2={Rth2}, pw={pw}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, pulsos hasta umbral={len(volt_din)}')
 
 # plt.figure()
 # plt.scatter(volt_din, (volt_rem/abs(curr_rem))[:len(volt_din)], c=t_rem[:len(volt_din)], cmap='cool')
@@ -165,7 +165,7 @@ plt.yscale('log')
 plt.grid()
 plt.show()
 
-plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V})-({hora}).png', dpi=400)
+plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', dpi=400)
 
 mensaje_tel(
 api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -175,7 +175,7 @@ mensaje = f'{filename} Ya acabé. {len(volt_din)} pulsos hasta el umbral'
 
 foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
           chat_id = '-1001926663084',
-          file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V})-({hora}).png', 'rb'))
+          file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', 'rb'))
 
 
 
