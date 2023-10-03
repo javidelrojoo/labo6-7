@@ -140,7 +140,7 @@ class K2612B:
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
         return np.array(t), np.array(volt), np.array(curr)
     
-    def autoR(self, V, Rth1, Rth2, rangei, limiti, rangev, cycles, pw, T1, T2, nplc, hslV=.4):
+    def autoR(self, V, Rth1, Rth2, rangei, limiti, rangev, pw, T1, T2, nplc, hslV=.4):
         self._smu.write(f'smub.measure.nplc = {nplc}')
         self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
         
@@ -153,6 +153,10 @@ class K2612B:
         self._smu.write('smub.measure.autorangei = smub.AUTORANGE_ON')
         self._smu.write('smub.measure.autorangev = smub.AUTORANGE_ON')
         
+        t0, volt0, curr0 = self.custom_volt([hslV]*10, pw, rangei, limiti, rangev, T1, nplc)
+        
+        Rth1 = np.mean(abs(volt0/curr0))/10
+        print(f'El umbral se puso en {Rth1*1e-6}MOhms')
         
         start_time = time.time()
         
@@ -220,10 +224,10 @@ class K2612B:
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             print(f'R = {hslV/i_rem*1e-6} MOhm')
             time.sleep(T2*10)
-            if time.time() - start_time > 60*15:    
+            if time.time() - start_time > 60*10:    
                 break
         
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-        
+        print(f'Se llegó a {Rth1*1e-6} MOhm con {len(volt_din)} pulsos')
         return np.array(t_din), np.array(volt_din), np.array(curr_din), np.array(t_rem), np.array(volt_rem), np.array(curr_rem)
     

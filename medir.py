@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '9-29'
+dia = '10-3'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -129,7 +129,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '80-Al-Au(C3-C4)'
 
-V = 4
+V = 4.2
 Rth1 = 4e6
 Rth2 = 12e6
 hslV = 0.4
@@ -137,11 +137,17 @@ pw = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-T1 = 0.01*4
-T2 = 0.01*4
+T1 = 0.01
+T2 = 0.01
 nplc = 0.5
 
-t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.autoR(V, Rth1, Rth2, rangei, limiti, rangev, cycles, pw, T1, T2, nplc, hslV)
+mensaje_tel(
+api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+chat_id = '-1001926663084',
+mensaje = f'Arranqué con el autoR {filename}'
+)
+
+t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.autoR(V, Rth1, Rth2, rangei, limiti, rangev, pw, T1, T2, nplc, hslV)
 
 hora = time.strftime("%H %M %S", time.localtime())
 save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Rht1={Rth1}, Rth2={Rth2}, pw={pw}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, pulsos hasta umbral={len(volt_din)}')
@@ -193,7 +199,7 @@ for i in np.concatenate((np.linspace(0, 8, 50, endpoint=False), np.linspace(8, 0
     volt_meas.append(i)
     
 # volt_meas = volt_meas+[0.4]*150
-# volt_meas = [0.4]*10
+volt_meas = [0.4]*10
 
 pw = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
