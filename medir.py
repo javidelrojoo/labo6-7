@@ -38,16 +38,7 @@ save_csv(data, filename)
 
 #%%
 ##################################################################
-# IMPORTS PARA KEITHLEY
-##################################################################
-
-import Keithley_K2612B.functions as functions
-import Keithley_K2612B.runner as runner
-from matplotlib.collections import LineCollection
-from matplotlib.colors import ListedColormap, BoundaryNorm
-#%%
-##################################################################
-# INICIALIZAR (PARA NUESTRO CODIGO A PROBAR)
+# INICIALIZAR KEITHLEY
 ##################################################################
 from Keithley_K2612B.keithleyK2612B import K2612B
 from keithley2600 import Keithley2600
@@ -130,10 +121,10 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 filename = '80-Al-Au(C3-C4)'
 
 V = 4.2
-Rth1 = 4e6
-Rth2 = 12e6
+Tmax = 10*60 #s
 hslV = 0.4
-pw = 0.1
+Twrite = 0.1
+Tread = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
@@ -147,10 +138,10 @@ chat_id = '-1001926663084',
 mensaje = f'Arranqué con el autoR {filename}'
 )
 
-t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.autoR(V, Rth1, Rth2, rangei, limiti, rangev, pw, T1, T2, nplc, hslV)
+t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV)
 
 hora = time.strftime("%H %M %S", time.localtime())
-save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Rht1={Rth1}, Rth2={Rth2}, pw={pw}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, pulsos hasta umbral={len(volt_din)}')
+save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, Rth={Rth}')
 
 # plt.figure()
 # plt.scatter(volt_din, (volt_rem/abs(curr_rem))[:len(volt_din)], c=t_rem[:len(volt_din)], cmap='cool')
@@ -301,6 +292,16 @@ plt.grid()
 # foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 #          chat_id = '-1001926663084',
 #          file_opened = open(f'./graficos/{dia}/{filename}-{V}V{num_med}.png', 'rb'))
+
+#%%
+##################################################################
+# IMPORTS PARA KEITHLEY (UNSAM)
+##################################################################
+
+import Keithley_K2612B.functions as functions
+import Keithley_K2612B.runner as runner
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
 #%%
 ##################################################################
 # INICIALIZAR (PARA EL CODIGO DE LA UNSAM)

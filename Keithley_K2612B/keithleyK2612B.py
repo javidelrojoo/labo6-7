@@ -140,7 +140,7 @@ class K2612B:
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
         return np.array(t), np.array(volt), np.array(curr)
     
-    def autoR(self, V, Rth1, Rth2, rangei, limiti, rangev, pw, T1, T2, nplc, hslV=.4):
+    def autoR(self, V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV=.4, ratioRth=1/10):
         self._smu.write(f'smub.measure.nplc = {nplc}')
         self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
         
@@ -153,10 +153,10 @@ class K2612B:
         self._smu.write('smub.measure.autorangei = smub.AUTORANGE_ON')
         self._smu.write('smub.measure.autorangev = smub.AUTORANGE_ON')
         
-        t0, volt0, curr0 = self.custom_volt([hslV]*10, pw, rangei, limiti, rangev, T1, nplc)
+        t0, volt0, curr0 = self.custom_volt([hslV]*10, Tread, rangei, limiti, rangev, T1, nplc)
         
-        Rth1 = np.mean(abs(volt0/curr0))/10
-        print(f'El umbral se puso en {Rth1*1e-6}MOhms')
+        Rth = np.mean(abs(volt0/curr0))*ratioRth
+        print(f'El umbral se puso en {Rth*1e-6}MOhms')
         
         start_time = time.time()
         
@@ -172,62 +172,59 @@ class K2612B:
         
         self._smu.write(f'smub.source.levelv = {hslV}')
         self._smu.write('smub.source.output = smub.OUTPUT_ON')
-        time.sleep(pw/2)
+        time.sleep(Tread/2)
         i_rem, v_rem = self._smu.query('print(smub.measure.iv())').split('\t')
-        time.sleep(pw/2)
+        time.sleep(Tread/2)
         i_rem = float(i_rem.strip('\n'))
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
         print(f'R = {hslV/i_rem*1e-6} MOhm')
         
-        while hslV/i_rem > Rth1:
+        while hslV/i_rem > Rth:
             
             self._smu.write(f'smub.source.levelv = {V}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
-            time.sleep(pw/2)
+            time.sleep(Twrite/2)
             t_din.append(time.time() - start_time)
             i_din, v_din = self._smu.query('print(smub.measure.iv())').split('\t')
             volt_din.append(float(v_din.strip('\n')))
             curr_din.append(float(i_din.strip('\n')))
-            time.sleep(pw/2)
+            time.sleep(Twrite/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             
             time.sleep(T1)
             
             self._smu.write(f'smub.source.levelv = {hslV}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
-            time.sleep(pw/2)
+            time.sleep(Tread/2)
             t_rem.append(time.time() - start_time)
             i_rem, v_rem = self._smu.query('print(smub.measure.iv())').split('\t')
             volt_rem.append(float(v_rem.strip('\n')))
             curr_rem.append(float(i_rem.strip('\n')))
             i_rem = float(i_rem.strip('\n'))
-            time.sleep(pw/2)
+            time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             print(f'{len(volt_din)} - R = {hslV/i_rem*1e-6} MOhm')
             
             time.sleep(T2)
-            
-            if time.time() - start_time > 60*10:    
-                break
-        print(f'Se llegó a {Rth1*1e-6} MOhm con {len(volt_din)} pulsos')
+        print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
         
         while True:
             self._smu.write(f'smub.source.levelv = {hslV}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
-            time.sleep(pw/2)
+            time.sleep(Tread/2)
             t_rem.append(time.time() - start_time)
             i_rem, v_rem = self._smu.query('print(smub.measure.iv())').split('\t')
             volt_rem.append(float(v_rem.strip('\n')))
             curr_rem.append(float(i_rem.strip('\n')))
             i_rem = float(i_rem.strip('\n'))
-            time.sleep(pw/2)
+            time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             print(f'R = {hslV/i_rem*1e-6} MOhm')
             time.sleep(T2*10)
-            if time.time() - start_time > 60*10:    
+            if time.time() - start_time > Tmax:    
                 break
         
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-        print(f'Se llegó a {Rth1*1e-6} MOhm con {len(volt_din)} pulsos')
-        return np.array(t_din), np.array(volt_din), np.array(curr_din), np.array(t_rem), np.array(volt_rem), np.array(curr_rem)
+        print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
+        return np.array(t_din), np.array(volt_din), np.array(curr_din), np.array(t_rem), np.array(volt_rem), np.array(curr_rem), len(volt_din), Rth
     
