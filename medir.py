@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '10-3'
+dia = '10-6'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -53,7 +53,7 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 filename = '80-Al-Au(C3-C4)'
 
 Vmax = 5
-Vmin = -5
+Vmin = -4.5
 hslV = 0.4
 pw = 0.1
 Npos = 50
@@ -61,7 +61,7 @@ Nneg = 50
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 2
+cycles = 1
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
@@ -120,8 +120,8 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '80-Al-Au(C3-C4)'
 
-V = 4.2
-Tmax = 10*60 #s
+V = 4
+Tmax = 0 #s
 hslV = 0.4
 Twrite = 0.1
 Tread = 0.1
@@ -155,7 +155,8 @@ save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora}
 # plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V},{Rth1},{Rth2})-IV-({hora}).png', dpi=400)
 
 plt.figure()
-plt.plot(t_rem, (volt_rem/abs(curr_rem)))
+plt.plot(t_rem, (volt_rem/abs(curr_rem)), '-o')
+plt.hlines(Rth, min(t_rem), max(t_rem), colors='k', linestyles='dashed')
 plt.xlabel('Tiempo [s]')
 plt.ylabel('Resistencia [$\Omega$]')
 plt.yscale('log')
@@ -174,8 +175,97 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
           chat_id = '-1001926663084',
           file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', 'rb'))
 
+#%%
+##################################################################
+# Curva IV y despues autoR
+##################################################################
+filename = '80-Al-Au(C3-C4)'
 
-
+for i in [3.5, 3.75, 4, 4.25, 4.5, 4.75, 5]:
+    Vmax = 5
+    Vmin = -4.5
+    hslV = 0.4
+    pw = 0.1
+    Npos = 50
+    Nneg = 50
+    rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
+    limiti = 0.5
+    rangev = 2
+    cycles = 1
+    T1 = 0.01
+    T2 = 0.01
+    nplc = 0.5
+    
+    t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem = smu.hsl(Vmax, Vmin, pw, Npos, Nneg, rangei, limiti, rangev, cycles, T1, T2, nplc, hslV)
+    hora = time.strftime("%H %M %S", time.localtime())
+    save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filename}-({Vmin},{Vmax})-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo dinamica [s], Voltaje dinamica [V], Corriente dinamica [A], Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, cycles={cycles}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}')
+    
+    plt.figure()
+    plt.scatter(volt_din, volt_rem/abs(curr_rem), c=t_rem, cmap='cool')
+    plt.xlabel('Voltaje [V]')
+    plt.ylabel('Resistencia [$\Omega$]')
+    plt.yscale('log')
+    plt.colorbar(label='Tiempo [s]')
+    plt.grid()
+    plt.show()
+    
+    plt.savefig(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', dpi=400)
+    
+    mensaje_tel(
+    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    chat_id = '-1001926663084',
+    mensaje = f'{filename} Ya acabé'
+    )
+    foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+              chat_id = '-1001926663084',
+              file_opened = open(f'./graficos/{dia}/{filename}-({Vmin},{Vmax})-({hora}).png', 'rb'))
+    
+    
+    V = i
+    Tmax = 0 #s
+    hslV = 0.4
+    Twrite = 0.1
+    Tread = 0.1
+    rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
+    limiti = 0.5
+    rangev = 2
+    T1 = 0.01
+    T2 = 0.01
+    nplc = 0.5
+    
+    mensaje_tel(
+    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    chat_id = '-1001926663084',
+    mensaje = f'{i}V - Arranqué con el autoR {filename}'
+    )
+    
+    t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV)
+    
+    hora = time.strftime("%H %M %S", time.localtime())
+    save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, Rth={Rth}')
+    
+    
+    plt.figure()
+    plt.plot(t_rem, (volt_rem/abs(curr_rem)), '-o')
+    plt.hlines(Rth, min(t_rem), max(t_rem), colors='k', linestyles='dashed')
+    plt.xlabel('Tiempo [s]')
+    plt.ylabel('Resistencia [$\Omega$]')
+    plt.yscale('log')
+    plt.grid()
+    plt.show()
+    
+    plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', dpi=400)
+    
+    mensaje_tel(
+    api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+    chat_id = '-1001926663084',
+    mensaje = f'{filename} Ya acabé. {len(volt_din)} pulsos hasta el umbral de {Rth*1e-6} MOhms'
+    )
+    
+    foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+              chat_id = '-1001926663084',
+              file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', 'rb'))
+    time.sleep(60)
 
 #%%
 ##################################################################

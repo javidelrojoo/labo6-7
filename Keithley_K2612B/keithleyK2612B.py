@@ -153,8 +153,8 @@ class K2612B:
         self._smu.write('smub.measure.autorangei = smub.AUTORANGE_ON')
         self._smu.write('smub.measure.autorangev = smub.AUTORANGE_ON')
         
-        t0, volt0, curr0 = self.custom_volt([hslV]*10, Tread, rangei, limiti, rangev, T1, nplc)
-        
+        t0, volt0, curr0 = self.custom_volt([hslV]*50, Tread, rangei, limiti, rangev, T1, nplc)
+        # print(volt0/curr0)
         Rth = np.mean(abs(volt0/curr0))*ratioRth
         print(f'El umbral se puso en {Rth*1e-6}MOhms')
         
@@ -176,10 +176,13 @@ class K2612B:
         i_rem, v_rem = self._smu.query('print(smub.measure.iv())').split('\t')
         time.sleep(Tread/2)
         i_rem = float(i_rem.strip('\n'))
+        v_rem = float(v_rem.strip('\n'))
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-        print(f'R = {hslV/i_rem*1e-6} MOhm')
+        print(f'R = {abs(v_rem/i_rem)*1e-6} MOhm')
         
-        while hslV/i_rem > Rth:
+        numRth = 0
+        
+        while numRth < 50:
             
             self._smu.write(f'smub.source.levelv = {V}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
@@ -201,11 +204,17 @@ class K2612B:
             volt_rem.append(float(v_rem.strip('\n')))
             curr_rem.append(float(i_rem.strip('\n')))
             i_rem = float(i_rem.strip('\n'))
+            v_rem = float(v_rem.strip('\n'))
             time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-            print(f'{len(volt_din)} - R = {hslV/i_rem*1e-6} MOhm')
+            print(f'{len(volt_din)} - R = {abs(v_rem/i_rem)*1e-6} MOhm')
             
             time.sleep(T2)
+            if abs(v_rem/i_rem) < Rth:
+                numRth += 1
+            if len(volt_din) > 2000:
+                break
+            
         print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
         
         while True:
@@ -217,6 +226,7 @@ class K2612B:
             volt_rem.append(float(v_rem.strip('\n')))
             curr_rem.append(float(i_rem.strip('\n')))
             i_rem = float(i_rem.strip('\n'))
+            v_rem = float(v_rem.strip('\n'))
             time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             print(f'R = {hslV/i_rem*1e-6} MOhm')
