@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '10-6'
+dia = '10-10'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -50,10 +50,10 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 ##################################################################
 # Curva IV con nuestro codigo
 ##################################################################
-filename = '80-Al-Au(C3-C4)'
+filename = '85-C-Al-Au(B1-B2)'
 
 Vmax = 5
-Vmin = -4.5
+Vmin = -5
 hslV = 0.4
 pw = 0.1
 Npos = 50
@@ -118,9 +118,9 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Pulsos hasta R de umbral y despues lectura
 ##################################################################
-filename = '80-Al-Au(C3-C4)'
+filename = '85-C-Al-Au(B1-B2)'
 
-V = 4
+V = 1
 Tmax = 0 #s
 hslV = 0.4
 Twrite = 0.1
@@ -128,6 +128,7 @@ Tread = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
+ratioRth = 9
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
@@ -138,7 +139,7 @@ chat_id = '-1001926663084',
 mensaje = f'Arranqué con el autoR {filename}'
 )
 
-t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV)
+t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV, ratioRth)
 
 hora = time.strftime("%H %M %S", time.localtime())
 save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, Rth={Rth}')
@@ -179,11 +180,11 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Curva IV y despues autoR
 ##################################################################
-filename = '80-Al-Au(C3-C4)'
+filename = '85-C-Al-Au(B1-B2)'
 
-for i in [3.5, 3.75, 4, 4.25, 4.5, 4.75, 5]:
+for i in [1.4, 1.4]:
     Vmax = 5
-    Vmin = -4.5
+    Vmin = -5
     hslV = 0.4
     pw = 0.1
     Npos = 50
@@ -229,18 +230,19 @@ for i in [3.5, 3.75, 4, 4.25, 4.5, 4.75, 5]:
     rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
     limiti = 0.5
     rangev = 2
+    ratioRth = 9
     T1 = 0.01
     T2 = 0.01
     nplc = 0.5
-    
+
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
     chat_id = '-1001926663084',
-    mensaje = f'{i}V - Arranqué con el autoR {filename}'
+    mensaje = f'Arranqué con el autoR {filename} con V={i} V'
     )
-    
-    t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV)
-    
+
+    t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV, ratioRth)
+
     hora = time.strftime("%H %M %S", time.localtime())
     save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, Rth={Rth}')
     
@@ -259,7 +261,7 @@ for i in [3.5, 3.75, 4, 4.25, 4.5, 4.75, 5]:
     mensaje_tel(
     api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
     chat_id = '-1001926663084',
-    mensaje = f'{filename} Ya acabé. {len(volt_din)} pulsos hasta el umbral de {Rth*1e-6} MOhms'
+    mensaje = f'{filename} Ya acabé V={i} V. {len(volt_din)} pulsos hasta el umbral de {Rth*1e-6} MOhms'
     )
     
     foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -290,7 +292,7 @@ T = 0.01
 nplc = 0.5
 
 t, volt, curr = smu.custom_volt(volt_meas, pw, rangei, limiti, rangev, T, nplc)
-# print(0.4/curr*1e-6)
+print(0.4/curr*1e-6)
 
 
 hora = time.strftime("%H %M %S", time.localtime())
