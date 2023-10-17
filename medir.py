@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '10-10'
+dia = '10-17'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -128,7 +128,7 @@ Tread = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-ratioRth = 9
+ratioRth = 0.1
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
@@ -142,7 +142,7 @@ mensaje = f'Arranqué con el autoR {filename}'
 t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV, ratioRth)
 
 hora = time.strftime("%H %M %S", time.localtime())
-save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, Rth={Rth}')
+save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}')
 
 # plt.figure()
 # plt.scatter(volt_din, (volt_rem/abs(curr_rem))[:len(volt_din)], c=t_rem[:len(volt_din)], cmap='cool')
@@ -182,7 +182,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '85-C-Al-Au(B1-B2)'
 
-for i in [1.4, 1.4]:
+for i in np.arange(4, 3.1, -0.05):
     Vmax = 5
     Vmin = -5
     hslV = 0.4
@@ -230,7 +230,7 @@ for i in [1.4, 1.4]:
     rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
     limiti = 0.5
     rangev = 2
-    ratioRth = 9
+    ratioRth = 0.2
     T1 = 0.01
     T2 = 0.01
     nplc = 0.5
@@ -244,7 +244,7 @@ for i in [1.4, 1.4]:
     t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV, ratioRth)
 
     hora = time.strftime("%H %M %S", time.localtime())
-    save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, Rth={Rth}')
+    save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}')
     
     
     plt.figure()

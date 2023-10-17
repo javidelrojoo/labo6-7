@@ -211,7 +211,7 @@ class K2612B:
             print(f'{len(volt_din)} - R = {abs(v_rem/i_rem)*1e-6} MOhm')
             
             time.sleep(T2)
-            if abs(v_rem/i_rem) > Rth:
+            if abs(v_rem/i_rem) < Rth:
                 numRth += 1
             if len(volt_din) > 2500:
                 break
