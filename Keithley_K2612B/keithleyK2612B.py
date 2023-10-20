@@ -182,7 +182,7 @@ class K2612B:
         print(f'R = {abs(v_rem/i_rem)*1e-6} MOhm')
         
         numRth = 0
-        
+        signo = 1
         while numRth < 50:
             
             self._smu.write(f'smub.source.levelv = {V}')
@@ -197,7 +197,7 @@ class K2612B:
             
             time.sleep(T1)
             
-            self._smu.write(f'smub.source.levelv = {hslV}')
+            self._smu.write(f'smub.source.levelv = {signo*hslV}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
             time.sleep(Tread/2)
             t_rem.append(time.time() - start_time)
@@ -209,7 +209,7 @@ class K2612B:
             time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             print(f'{len(volt_din)} - R = {abs(v_rem/i_rem)*1e-6} MOhm')
-            
+            signo *= -1
             time.sleep(T2)
             if abs(v_rem/i_rem) < Rth:
                 numRth += 1
@@ -218,8 +218,9 @@ class K2612B:
             
         print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
         
+        signo = 1
         while True:
-            self._smu.write(f'smub.source.levelv = {hslV}')
+            self._smu.write(f'smub.source.levelv = {signo*hslV}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
             time.sleep(Tread/2)
             t_rem.append(time.time() - start_time)
@@ -231,6 +232,7 @@ class K2612B:
             time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             print(f'R = {hslV/i_rem*1e-6} MOhm')
+            signo *= -1
             time.sleep(T2*10)
             if time.time() - start_time > Tmax:    
                 break
