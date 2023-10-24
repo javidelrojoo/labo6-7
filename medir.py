@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '10-20'
+dia = '10-24'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -57,11 +57,11 @@ Vmin = -5
 hslV = 0.4
 pw = 0.1
 Npos = 50
-Nneg = 0
+Nneg = 50
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 1
+cycles = 2
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
@@ -128,9 +128,9 @@ Tread = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-ratioRth = 0.2
-T1 = 0.01
-T2 = 0.01
+ratioRth = 0.01
+T1 = 0.02
+T2 = T1
 nplc = 0.5
 
 mensaje_tel(
@@ -156,7 +156,7 @@ save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora}
 # plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V},{Rth1},{Rth2})-IV-({hora}).png', dpi=400)
 
 plt.figure()
-plt.plot(t_rem, (volt_rem/abs(curr_rem)), '-o')
+plt.plot(t_rem, abs(volt_rem/curr_rem), '-o')
 plt.hlines(Rth, min(t_rem), max(t_rem), colors='k', linestyles='dashed')
 plt.xlabel('Tiempo [s]')
 plt.ylabel('Resistencia [$\Omega$]')
@@ -182,9 +182,10 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '85-C-Al-Au(B1-B2)'
 
-Nfires = []
+# Nfires = []
+paramsList = [2, 3, 4]
 
-for i in [0.3, 0.2, 0.1]:
+for i in paramsList:
     Vmax = 5
     Vmin = 0
     hslV = 0.4
@@ -204,7 +205,7 @@ for i in [0.3, 0.2, 0.1]:
     save_csv(t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, filename=f'{filename}-({Vmin},{Vmax})-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo dinamica [s], Voltaje dinamica [V], Corriente dinamica [A], Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n Vmax={Vmax}, Vmin={Vmin}, Npos={Npos}, Nneg={Nneg}, pw={pw}, cycles={cycles}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}')
     
     plt.figure()
-    plt.scatter(volt_din, volt_rem/abs(curr_rem), c=t_rem, cmap='cool')
+    plt.scatter(volt_din, abs(volt_rem/curr_rem), c=t_rem, cmap='cool')
     plt.xlabel('Voltaje [V]')
     plt.ylabel('Resistencia [$\Omega$]')
     plt.yscale('log')
@@ -228,23 +229,23 @@ for i in [0.3, 0.2, 0.1]:
         
     
     V = -3.5
-    Tmax = 5*60 #s
-    hslV = i
+    Tmax = 0 #s
+    hslV = 0.4
     Twrite = 0.1
     Tread = 0.1
     rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
     limiti = 0.5
     rangev = 2
     ratioRth = 0.2
-    T1 = 0.01
-    T2 = 0.01
+    T1 = i
+    T2 = T1
     nplc = 0.5
     
     try:
         mensaje_tel(
         api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
         chat_id = '-1001926663084',
-        mensaje = f'Arranqué con el autoR {filename} con Twrite = {i} s'
+        mensaje = f'Arranqué con el autoR {filename} con parámetro {i}'
         )
     except:
         pass
@@ -253,6 +254,8 @@ for i in [0.3, 0.2, 0.1]:
 
     hora = time.strftime("%H %M %S", time.localtime())
     save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}')
+    
+    Nfires.append(Nfire)
     
     plt.figure()
     plt.plot(t_rem, abs((volt_rem/curr_rem)), '-o')
@@ -269,7 +272,7 @@ for i in [0.3, 0.2, 0.1]:
         mensaje_tel(
         api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
         chat_id = '-1001926663084',
-        mensaje = f'{filename} con Twrite = {i} s. {len(volt_din)} pulsos hasta el umbral de {round(Rth*1e-6, 3)} MOhms'
+        mensaje = f'{filename} con parámetro {i}. {len(volt_din)} pulsos hasta el umbral de {round(Rth*1e-6, 3)} MOhms'
         )
         
         foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -279,6 +282,21 @@ for i in [0.3, 0.2, 0.1]:
         pass
     time.sleep(60)
 
+x = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.4, 0.8, 1.6]
+for i in paramsList:
+    x.append(i)
+
+plt.figure()
+plt.scatter(x, Nfires)
+plt.xlabel('Parámetro')
+plt.ylabel('Nfire')
+plt.grid()
+plt.show()
+
+plt.savefig(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', dpi=400)
+foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+          chat_id = '-1001926663084',
+          file_opened = open(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', 'rb'))
 #%%
 ##################################################################
 # Voltaje custom (acumulacion de pulsos)
