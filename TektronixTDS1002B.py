@@ -61,7 +61,9 @@ class TDS1002B:
         # Hace aparecer el canal en pantalla. Por si no está habilitado
         self._osci.write("SEL:CH{0} ON".format(channel)) 
         # Selecciona el canal
-        self._osci.write("DAT:SOU CH{0}".format(channel)) 
+        self._osci.write("DAT:SOU CH{0}".format(channel))
+        self._osci.write("DAT:STAR 1")
+        self._osci.write("DAT:STOP 10000")
     	#xze primer punto de la waveform
     	#xin intervalo de sampleo
     	#ymu factor de escala vertical

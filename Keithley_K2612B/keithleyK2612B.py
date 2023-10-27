@@ -211,7 +211,7 @@ class K2612B:
             time.sleep(T2)
             if abs(v_rem/i_rem) < Rth:
                 numRth += 1
-            if len(volt_din) > 2500:
+            if len(volt_din) > 1500:
                 break
             
         print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')

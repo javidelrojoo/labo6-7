@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '10-24'
+dia = '10-27'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -21,20 +21,8 @@ dia = '10-24'
 
 os.mkdir(f'./results/Tonghui/{dia}')
 os.mkdir(f'./results/Keithley/{dia}')
+os.mkdir(f'./results/Osciloscopio/{dia}')
 os.mkdir(f'./graficos/{dia}')
-#%%
-from TektronixTDS1002B import TDS1002B
-
-osci = TDS1002B('USB0::0x0699::0x0413::C012302::INSTR')
-
-t1, ch1 = osci.read_data(1)
-t2, ch2 = osci.read_data(2)
-
-
-plt.plot(t1, ch1)
-plt.plot(t2, ch2)
-
-save_csv(data, filename)
 
 #%%
 ##################################################################
@@ -50,18 +38,18 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 ##################################################################
 # Curva IV con nuestro codigo
 ##################################################################
-filename = '85-C-Al-Au(B1-B2)'
+filename = '85-Al-Au(A3-A4)'
 
 Vmax = 5
 Vmin = -5
 hslV = 0.4
 pw = 0.1
 Npos = 50
-Nneg = 50
+Nneg = 0
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-cycles = 2
+cycles = 1
 T1 = 0.01
 T2 = 0.01
 nplc = 0.5
@@ -118,9 +106,9 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Pulsos hasta R de umbral y despues lectura
 ##################################################################
-filename = '85-C-Al-Au(B1-B2)'
+filename = '85-Al-Au(A3-A4)'
 
-V = -3.5
+V = -2.5
 Tmax = 0 #s
 hslV = 0.4
 Twrite = 0.1
@@ -128,8 +116,8 @@ Tread = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-ratioRth = 0.01
-T1 = 0.02
+ratioRth = 0.2
+T1 = 0.01
 T2 = T1
 nplc = 0.5
 
@@ -180,14 +168,14 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Curva IV y despues autoR
 ##################################################################
-filename = '85-C-Al-Au(B1-B2)'
+filename = '85-Al-Au(A3-A4)'
 
-# Nfires = []
-paramsList = [2, 3, 4]
+Nfires = []
+paramsList = [-3, -2.9, -2.8, -2.7, -2.6, -2.5, -2.4]
 
 for i in paramsList:
     Vmax = 5
-    Vmin = 0
+    Vmin = -5
     hslV = 0.4
     pw = 0.1
     Npos = 50
@@ -228,7 +216,7 @@ for i in paramsList:
         pass
         
     
-    V = -3.5
+    V = i
     Tmax = 0 #s
     hslV = 0.4
     Twrite = 0.1
@@ -237,7 +225,7 @@ for i in paramsList:
     limiti = 0.5
     rangev = 2
     ratioRth = 0.2
-    T1 = i
+    T1 = 0.01
     T2 = T1
     nplc = 0.5
     
@@ -282,12 +270,11 @@ for i in paramsList:
         pass
     time.sleep(60)
 
-x = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.4, 0.8, 1.6]
-for i in paramsList:
-    x.append(i)
+x = paramsList
+y =  Nfires
 
 plt.figure()
-plt.scatter(x, Nfires)
+plt.scatter(x, y)
 plt.xlabel('Parámetro')
 plt.ylabel('Nfire')
 plt.grid()
@@ -529,6 +516,40 @@ for V, num_med in zip([5], [' 2']):
              chat_id = '-1001926663084',
              file_opened = open(f'./graficos/{dia}/{filename}-{V}V{num_med}.png', 'rb'))
     # time.sleep(120)
+#%%
+from TektronixTDS1002B import TDS1002B
+
+osci = TDS1002B('USB0::0x0699::0x0413::C012302::INSTR')
+#%%
+Vmax = 5
+Vmin = -5
+hslV = 0.4
+pw = 0.1
+Npos = 2
+Nneg = 0
+rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
+limiti = 0.5
+rangev = 2
+cycles = 2
+T1 = 0.01
+T2 = 0.01
+nplc = 0.5
+
+for i in np.linspace(0, 1, 25):
+    osci.set_time((i+0.01))
+    time.sleep(i)
+    smu.hsl(Vmax, Vmin, i, Npos, Nneg, rangei, limiti, rangev, cycles, T1, T2, nplc, hslV)
+    time.sleep(11*i)
+
+    plt.figure()
+
+    t1, ch1 = osci.read_data(1)
+
+    plt.plot(t1, ch1)
+
+    save_csv(t1, ch1, filename=f'Pulsos-{i}', root=f'./results/Osciloscopio/{dia}/')
+
+
 #%%
 ##################################################################
 # IMPORTS PARA TONGHUI
