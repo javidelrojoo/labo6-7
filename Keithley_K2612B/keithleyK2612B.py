@@ -140,7 +140,7 @@ class K2612B:
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
         return np.array(t), np.array(volt), np.array(curr)
     
-    def autoR(self, V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, hslV=.4, ratioRth=1/10):
+    def autoR(self, V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth=50, hslV=.4, ratioRth=1/10):
         self._smu.write(f'smub.measure.nplc = {nplc}')
         self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
         
@@ -182,7 +182,7 @@ class K2612B:
         print(f'R = {abs(v_rem/i_rem)*1e-6} MOhm')
         
         numRth = 0
-        while numRth < 50:
+        while numRth < Nth:
             
             self._smu.write(f'smub.source.levelv = {V}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
