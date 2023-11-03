@@ -108,7 +108,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '85-Al-Au(A3-A4)'
 
-V = -2.5
+V = -3.2
 Tmax = 0 #s
 hslV = 0.4
 Twrite = 0.1
@@ -169,10 +169,10 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Curva IV y despues autoR
 ##################################################################
-filename = '85-Al-Au(A3-A4)'
+filename = '85-C-Al-Au(B1-B2)'
 
 Nfires = []
-paramsList = [-3, -2.9, -2.8, -2.7, -2.6, -2.5, -2.4]
+paramsList = [-4.2, -4.1, -4, -3.9, -3.8, -3.7, -3.6, -3.5, -3.4, -3.3, -3.2]*2
 
 for i in paramsList:
     Vmax = 5

@@ -213,9 +213,9 @@ class K2612B:
                 numRth += 1
             if len(volt_din) > 1500:
                 break
-            
-        print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
         
+        print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
+        t0 = time.time()
         while True:
             self._smu.write(f'smub.source.levelv = {hslV}')
             self._smu.write('smub.source.output = smub.OUTPUT_ON')
@@ -230,7 +230,7 @@ class K2612B:
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
             print(f'R = {abs(v_rem/i_rem)*1e-6} MOhm')
             time.sleep(T2*10)
-            if time.time() - start_time > Tmax:    
+            if time.time() - t0 > Tmax:    
                 break
         
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
