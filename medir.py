@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '10-27'
+dia = '11-7'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -38,7 +38,7 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 ##################################################################
 # Curva IV con nuestro codigo
 ##################################################################
-filename = '85-Al-Au(A3-A4)'
+filename = '85-C-Al-Au(B1-B2)'
 
 Vmax = 5
 Vmin = -5
@@ -106,12 +106,12 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Pulsos hasta R de umbral y despues lectura
 ##################################################################
-filename = '85-Al-Au(A3-A4)'
+filename = '85-C-Al-Au(B1-B2)'
 
-V = -3.2
+V = -3.8
 Tmax = 0 #s
 hslV = 0.4
-Twrite = 0.1
+Twrite = 0
 Tread = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
@@ -172,7 +172,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 filename = '85-C-Al-Au(B1-B2)'
 
 Nfires = []
-paramsList = [-4.2, -4.1, -4, -3.9, -3.8, -3.7, -3.6, -3.5, -3.4, -3.3, -3.2]*2
+paramsList = [-3.8, -3.75, -3.7, -3.65, -3.6, -3.55, -3.5, -3.45, -3.4, -3.35, -3.3]*3
 
 for i in paramsList:
     Vmax = 5
@@ -184,7 +184,7 @@ for i in paramsList:
     rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
     limiti = 0.5
     rangev = 2
-    cycles = 1
+    cycles = 2
     T1 = 0.01
     T2 = 0.01
     nplc = 0.5
@@ -220,7 +220,7 @@ for i in paramsList:
     V = i
     Tmax = 0 #s
     hslV = 0.4
-    Twrite = 0.1
+    Twrite = 0
     Tread = 0.1
     rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
     limiti = 0.5
@@ -272,13 +272,14 @@ for i in paramsList:
         pass
     time.sleep(60)
 
-x = paramsList
+x = paramsList[:23]
 y =  Nfires
 
 plt.figure()
 plt.scatter(x, y)
 plt.xlabel('Parámetro')
 plt.ylabel('Nfire')
+plt.yscale('log')
 plt.grid()
 plt.show()
 
