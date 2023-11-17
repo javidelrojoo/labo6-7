@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '11-14'
+dia = '11-17'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -171,7 +171,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '85-C-Al-Au(B1-B2)'
 
-tons = [0.25, 0.2]
+tons = [0.05]
 for ton in tons:
     try:
         mensaje_tel(
@@ -182,7 +182,7 @@ for ton in tons:
     except:
         pass
     Nfires = []
-    paramsList = [-4.8, -4.6, -4.4, -4.2, -4, -3.8, -3.6, -3.4, -3.2]*3
+    paramsList = [-3.8, -3.7, -3.6, -3.5, -3.4, -3.3, -3.2]*10
     
     for i, param in enumerate(paramsList):
         Vmax = 5
@@ -245,7 +245,7 @@ for ton in tons:
             mensaje_tel(
             api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
             chat_id = '-1001926663084',
-            mensaje = f'Arranqué con el autoR {filename} con parámetro {param} ({i/len(paramsList)})'
+            mensaje = f'Arranqué con el autoR {filename} con parámetro {param} ({i}/{len(paramsList)})'
             )
         except:
             pass
