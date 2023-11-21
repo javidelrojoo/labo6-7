@@ -217,7 +217,7 @@ class K2612B:
             if len(volt_din) > 1500:
                 break
         
-        print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
+        print(f'\nSe llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
         t0 = time.time()
         while True:
             self._smu.write(f'smub.source.levelv = {hslV}')
@@ -237,7 +237,7 @@ class K2612B:
                 break
         
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-        print(f'Se llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
+        print(f'\nSe llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
         return np.array(t_din), np.array(volt_din), np.array(curr_din), np.array(t_rem), np.array(volt_rem), np.array(curr_rem), len(volt_din), Rth
    
     def autohsl(self, Vmax, Vmin, pw, Npos, Nneg, rangei, limiti, rangev, T1, T2, nplc, Rth, hslV=.4):
