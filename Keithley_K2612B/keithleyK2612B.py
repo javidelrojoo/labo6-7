@@ -2,6 +2,7 @@ import time
 import pyvisa
 import numpy as np
 from tqdm import tqdm
+import sys
 
 class K2612B:
     def __init__(self, name):
@@ -179,7 +180,7 @@ class K2612B:
         i_rem = float(i_rem.strip('\n'))
         v_rem = float(v_rem.strip('\n'))
         self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-        print(f'R = {abs(v_rem/i_rem)*1e-6} MOhm')
+        sys.stdout.write(f'\rR = {abs(v_rem/i_rem)*1e-6} MOhm')
         
         numRth = 0
         while numRth < Nth:
@@ -209,7 +210,7 @@ class K2612B:
             v_rem = float(v_rem.strip('\n'))
             time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-            print(f'{len(volt_din)} - R = {abs(v_rem/i_rem)*1e-6} MOhm')
+            sys.stdout.write(f'\R{len(volt_din)} - R = {abs(v_rem/i_rem)*1e-6} MOhm')
             time.sleep(T2)
             if abs(v_rem/i_rem) < Rth:
                 numRth += 1
@@ -230,7 +231,7 @@ class K2612B:
             v_rem = float(v_rem.strip('\n'))
             time.sleep(Tread/2)
             self._smu.write('smub.source.output = smub.OUTPUT_OFF')
-            print(f'R = {abs(v_rem/i_rem)*1e-6} MOhm')
+            sys.stdout.write(f'\rR = {abs(v_rem/i_rem)*1e-6} MOhm')
             time.sleep(T2*10)
             if time.time() - t0 > Tmax:    
                 break
