@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '11-17'
+dia = '11-21'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -171,7 +171,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '85-C-Al-Au(B1-B2)'
 
-tons = [0.05]
+tons = [0.025, 0.012]
 for ton in tons:
     try:
         mensaje_tel(
@@ -282,8 +282,8 @@ for ton in tons:
             pass
         time.sleep(60)
     
-    x = paramsList
-    y =  Nfires
+    x = np.array(paramsList)
+    y =  np.array(Nfires)
     
     plt.figure()
     plt.scatter(x, y)
@@ -294,9 +294,35 @@ for ton in tons:
     plt.show()
     
     plt.savefig(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', dpi=400)
-    foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
-              chat_id = '-1001926663084',
-              file_opened = open(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', 'rb'))
+    try:
+        foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+                  chat_id = '-1001926663084',
+                  file_opened = open(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', 'rb'))
+    except:
+        pass
+    
+    y_mean = []
+    for i in np.unique(x):
+      y_mean.append(np.mean(y[np.where(x == i)]))
+    
+    plt.figure()
+    plt.scatter(np.unique(x), y_mean)
+    plt.xlabel('Parámetro')
+    plt.ylabel('Nfire promedio')
+    plt.yscale('log')
+    plt.grid()
+    plt.show()
+    
+    plt.savefig(f'./graficos/{dia}/{filename}-(Nfires_mean)-({V}V)-({hora}).png', dpi=400)
+    try:
+        foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+                  chat_id = '-1001926663084',
+                  file_opened = open(f'./graficos/{dia}/{filename}-(Nfires_mean)-({V}V)-({hora}).png', 'rb'))
+    except:
+        pass
+    
+    plt.close('all')
+    
 #%%
 ##################################################################
 # Voltaje custom (acumulacion de pulsos)
