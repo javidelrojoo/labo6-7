@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '11-21'
+dia = '11-22'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -171,7 +171,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '85-C-Al-Au(B1-B2)'
 
-tons = [0.025, 0.012]
+tons = [0.060, 0.050, 0.040]
 for ton in tons:
     try:
         mensaje_tel(
@@ -182,7 +182,7 @@ for ton in tons:
     except:
         pass
     Nfires = []
-    paramsList = [-3.8, -3.7, -3.6, -3.5, -3.4, -3.3, -3.2]*10
+    paramsList = [-3.8, -3.75, -3.7, -3.65, -3.6]*10
     
     for i, param in enumerate(paramsList):
         Vmax = 5
