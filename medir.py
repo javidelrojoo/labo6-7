@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '11-22'
+dia = '11-24'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -38,7 +38,7 @@ smu = K2612B('USB0::0x05E6::0x2614::4103593::INSTR')
 ##################################################################
 # Curva IV con nuestro codigo
 ##################################################################
-filename = '85-C-Al-Au(B1-B2)'
+filename = '85-C-Al-Au(A1-B2)'
 
 Vmax = 5
 Vmin = -5
@@ -106,7 +106,7 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Pulsos hasta R de umbral y despues lectura
 ##################################################################
-filename = '85-C-Al-Au(B1-B2)'
+filename = '85-C-Al-Au(A1-B2)'
 
 V = -4.8
 Tmax = 0 #s
@@ -169,9 +169,9 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 # Curva IV y despues autoR
 ##################################################################
-filename = '85-C-Al-Au(B1-B2)'
+filename = '85-C-Al-Au(A1-B2)'
 
-tons = [0.060, 0.050, 0.040]
+tons = [0.05]
 for ton in tons:
     try:
         mensaje_tel(
@@ -182,7 +182,7 @@ for ton in tons:
     except:
         pass
     Nfires = []
-    paramsList = [-3.8, -3.75, -3.7, -3.65, -3.6]*10
+    paramsList = [-3.8, -3.7, -3.6, -3.5, -3.4, -3.3, -3.2]*2
     
     for i, param in enumerate(paramsList):
         Vmax = 5
