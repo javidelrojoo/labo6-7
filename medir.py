@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 # CAMBIARLO EN CADA DIA Y EN CADA MEDICION
 ##################################################################
 
-dia = '11-24'
+dia = '12-1'
 #%%
 ##################################################################
 # CORRERLO UNA VEZ POR DIA
@@ -45,7 +45,7 @@ Vmin = -5
 hslV = 0.4
 pw = 0.1
 Npos = 50
-Nneg = 50
+Nneg = 0
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
@@ -108,15 +108,16 @@ foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
 ##################################################################
 filename = '85-C-Al-Au(A1-B2)'
 
-V = -4.8
+# V = -4.8
+I = -6e-7
 Tmax = 0 #s
 hslV = 0.4
-Twrite = 0
+Twrite = 0.05
 Tread = 0.1
 rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
 limiti = 0.5
 rangev = 2
-ratioRth = 0.2
+ratioRth = 0.6
 Nth = 5
 T1 = 0.01
 T2 = T1
@@ -128,10 +129,12 @@ chat_id = '-1001926663084',
 mensaje = f'Arranqué con el autoR {filename}'
 )
 
-t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth, hslV, ratioRth)
+# t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth, hslV, ratioRth)
+t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR_I(I, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth, hslV, ratioRth)
 
 hora = time.strftime("%H %M %S", time.localtime())
-save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}, Nth={Nth}')
+# save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}, Nth={Nth}')
+save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR_I)-({I}A)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n I={I}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}, Nth={Nth}')
 
 # plt.figure()
 # plt.scatter(volt_din, (volt_rem/abs(curr_rem))[:len(volt_din)], c=t_rem[:len(volt_din)], cmap='cool')
@@ -153,7 +156,9 @@ plt.yscale('log')
 plt.grid()
 plt.show()
 
-plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', dpi=400)
+# plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', dpi=400)
+plt.savefig(f'./graficos/{dia}/{filename}-(autoR_I)-({I}A)-({hora}).png', dpi=400)
+
 
 mensaje_tel(
 api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
@@ -161,9 +166,12 @@ chat_id = '-1001926663084',
 mensaje = f'{filename} Ya acabé. {len(volt_din)} pulsos hasta el umbral'
 )
 
+# foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+#           chat_id = '-1001926663084',
+#           file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', 'rb'))
 foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
           chat_id = '-1001926663084',
-          file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', 'rb'))
+          file_opened = open(f'./graficos/{dia}/{filename}-(autoR_I)-({I}A)-({hora}).png', 'rb'))
 
 #%%
 ##################################################################
@@ -182,7 +190,7 @@ for ton in tons:
     except:
         pass
     Nfires = []
-    paramsList = [-3.8, -3.7, -3.6, -3.5, -3.4, -3.3, -3.2]*2
+    paramsList = [-6e-7, -7e-7, -8e-7, -9e-7, -1e-8]*2
     
     for i, param in enumerate(paramsList):
         Vmax = 5
@@ -227,7 +235,8 @@ for ton in tons:
             pass
             
         
-        V = param
+        # V = param
+        I = param
         Tmax = 0 #s
         hslV = 0.4
         Twrite = ton
@@ -235,7 +244,7 @@ for ton in tons:
         rangei = 1e-3 #[1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.5]
         limiti = 0.5
         rangev = 2
-        ratioRth = 0.2
+        ratioRth = 0.6
         Nth = 50
         T1 = 0.01
         T2 = T1
@@ -250,10 +259,13 @@ for ton in tons:
         except:
             pass
     
-        t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth, hslV, ratioRth)
+        # t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR(V, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth, hslV, ratioRth)
+        t_din, volt_din, curr_din, t_rem, volt_rem, curr_rem, Nfire, Rth = smu.autoR_I(I, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth, hslV, ratioRth)
     
         hora = time.strftime("%H %M %S", time.localtime())
-        save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}, Nth={Nth}')
+        # save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR)-({V}V)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n V={V}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}, Nth={Nth}')
+        save_csv(t_rem, volt_rem, curr_rem, filename=f'{filename}-(autoR_I)-({I}A)-({hora})', root=f'./results/Keithley/{dia}/', delimiter=',', header=f'{time.ctime()}\n Tiempo remanente [s], Voltaje remanente [V], Corriente remanente [A]\n I={I}, Tmax={Tmax}, Twrite={Twrite}, Tread={Tread}, hslV={hslV}, T1 = {T1}, T2 = {T2}, nplc={nplc}, Nfire={Nfire}, ratioRth={ratioRth}, Rth={Rth}, Nth={Nth}')
+
         
         Nfires.append(Nfire)
         
@@ -266,7 +278,9 @@ for ton in tons:
         plt.grid()
         plt.show()
         
-        plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', dpi=400)
+        # plt.savefig(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', dpi=400)
+        plt.savefig(f'./graficos/{dia}/{filename}-(autoR_I)-({I}A)-({hora}).png', dpi=400)
+
         
         try:
             mensaje_tel(
@@ -275,9 +289,13 @@ for ton in tons:
             mensaje = f'{filename} con parámetro {param}. {len(volt_din)} pulsos hasta el umbral de {round(Rth*1e-6, 3)} MOhms'
             )
             
+            # foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+            #           chat_id = '-1001926663084',
+            #           file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', 'rb'))
+            
             foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
                       chat_id = '-1001926663084',
-                      file_opened = open(f'./graficos/{dia}/{filename}-(autoR)-({V}V)-({hora}).png', 'rb'))
+                      file_opened = open(f'./graficos/{dia}/{filename}-(autoR_I)-({I}A)-({hora}).png', 'rb'))
         except:
             pass
         time.sleep(60)
@@ -293,11 +311,16 @@ for ton in tons:
     plt.grid()
     plt.show()
     
-    plt.savefig(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', dpi=400)
+    # plt.savefig(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', dpi=400)
+    plt.savefig(f'./graficos/{dia}/{filename}-(Nfires)-({I}A)-({hora}).png', dpi=400)
     try:
+        # foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+        #           chat_id = '-1001926663084',
+        #           file_opened = open(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', 'rb'))
+        
         foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
                   chat_id = '-1001926663084',
-                  file_opened = open(f'./graficos/{dia}/{filename}-(Nfires)-({V}V)-({hora}).png', 'rb'))
+                  file_opened = open(f'./graficos/{dia}/{filename}-(Nfires)-({I}A)-({hora}).png', 'rb'))
     except:
         pass
     
@@ -313,16 +336,21 @@ for ton in tons:
     plt.grid()
     plt.show()
     
-    plt.savefig(f'./graficos/{dia}/{filename}-(Nfires_mean)-({V}V)-({hora}).png', dpi=400)
+    # plt.savefig(f'./graficos/{dia}/{filename}-(Nfires_mean)-({V}V)-({hora}).png', dpi=400)
+    plt.savefig(f'./graficos/{dia}/{filename}-(Nfires_mean)-({I}A)-({hora}).png', dpi=400)
     try:
+        # foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
+        #           chat_id = '-1001926663084',
+        #           file_opened = open(f'./graficos/{dia}/{filename}-(Nfires_mean)-({V}V)-({hora}).png', 'rb'))
+        
         foto_tel(api_token = '6228563199:AAFh4PtD34w0dmV_hFlQC7Vqg3ScI600Djs',
                   chat_id = '-1001926663084',
-                  file_opened = open(f'./graficos/{dia}/{filename}-(Nfires_mean)-({V}V)-({hora}).png', 'rb'))
+                  file_opened = open(f'./graficos/{dia}/{filename}-(Nfires_mean)-({I}A)-({hora}).png', 'rb'))
     except:
         pass
     
     plt.close('all')
-    
+
 #%%
 ##################################################################
 # Voltaje custom (acumulacion de pulsos)

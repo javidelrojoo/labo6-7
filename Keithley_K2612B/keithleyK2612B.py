@@ -300,3 +300,106 @@ class K2612B:
             R_rem = volt_rem[-1]/curr_rem[-1]
             
         return np.array(t_din), np.array(volt_din), np.array(curr_din), np.array(t_rem), np.array(volt_rem), np.array(curr_rem)
+    
+    def autoR_I(self, I, Tmax, rangei, limiti, rangev, Twrite, Tread, T1, T2, nplc, Nth=50, hslV=.4, ratioRth=1/10):
+        self._smu.write(f'smub.measure.nplc = {nplc}')
+        self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')  # Configurar el modo de generación de voltaje a voltaje DC
+        
+        # self._smu.write('smub.measure.autorangei = smub.AUTORANGE_OFF')
+        # self._smu.write('smub.measure.autorangev = smub.AUTORANGE_OFF')
+        # self._smu.write(f'smub.source.limiti = {limiti}')
+        # self._smu.write(f'smub.measure.rangei = {rangei}')
+        # self._smu.write(f'smub.measure.rangev = {rangev}')
+        
+        self._smu.write('smub.measure.autorangei = smub.AUTORANGE_ON')
+        self._smu.write('smub.measure.autorangev = smub.AUTORANGE_ON')
+        
+        t0, volt0, curr0 = self.custom_volt([hslV]*50, Tread, rangei, limiti, rangev, T1, nplc)
+        # print(volt0/curr0)
+        Rth = np.mean(abs(volt0/curr0))*ratioRth
+        # Rth = 1e8
+        print(f'El umbral se puso en {Rth*1e-6}MOhms')
+        
+        start_time = time.time()
+        
+        t_din = []
+        volt_din = []
+        curr_din = []
+        
+        t_rem = []
+        volt_rem = []
+        curr_rem = []
+        
+        self._smu.write(f'smub.source.levelv = 0')
+        
+        self._smu.write(f'smub.source.levelv = {hslV}')
+        self._smu.write('smub.source.output = smub.OUTPUT_ON')
+        time.sleep(Tread/2)
+        i_rem, v_rem = self._smu.query('print(smub.measure.iv())').split('\t')
+        time.sleep(Tread/2)
+        i_rem = float(i_rem.strip('\n'))
+        v_rem = float(v_rem.strip('\n'))
+        self._smu.write('smub.source.output = smub.OUTPUT_OFF')
+        sys.stdout.write(f'\rR = {abs(v_rem/i_rem)*1e-6} MOhm')
+        
+        numRth = 0
+        while numRth < Nth:
+            
+            self._smu.write('smub.source.func = smub.OUTPUT_DCAMPS')
+            self._smu.write(f'smub.source.leveli = {I}')
+            self._smu.write('smub.source.output = smub.OUTPUT_ON')
+            time.sleep(Twrite/2)
+            t_din.append(time.time() - start_time)
+            # i_din, v_din = self._smu.query('print(smub.measure.iv())').split('\t')
+            # volt_din.append(float(v_din.strip('\n')))
+            # curr_din.append(float(i_din.strip('\n')))
+            volt_din.append(0)
+            curr_din.append(0)
+            time.sleep(Twrite/2)
+            self._smu.write('smub.source.output = smub.OUTPUT_OFF')
+            
+            time.sleep(T1)
+            
+            self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')
+            self._smu.write(f'smub.source.levelv = {hslV}')
+            self._smu.write('smub.source.output = smub.OUTPUT_ON')
+            time.sleep(Tread/2)
+            t_rem.append(time.time() - start_time)
+            i_rem, v_rem = self._smu.query('print(smub.measure.iv())').split('\t')
+            volt_rem.append(float(v_rem.strip('\n')))
+            curr_rem.append(float(i_rem.strip('\n')))
+            i_rem = float(i_rem.strip('\n'))
+            v_rem = float(v_rem.strip('\n'))
+            time.sleep(Tread/2)
+            self._smu.write('smub.source.output = smub.OUTPUT_OFF')
+            sys.stdout.write(f'\r{len(volt_din)} - R = {abs(v_rem/i_rem)*1e-6} MOhm')
+            time.sleep(T2)
+            if abs(v_rem/i_rem) < Rth:
+                numRth += 1
+            if len(volt_din) > 1500:
+                break
+        
+        print(f'\nSe llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
+        t0 = time.time()
+        self._smu.write('smub.source.func = smub.OUTPUT_DCVOLTS')
+        while True:
+            self._smu.write(f'smub.source.levelv = {hslV}')
+            self._smu.write('smub.source.output = smub.OUTPUT_ON')
+            time.sleep(Tread/2)
+            t_rem.append(time.time() - start_time)
+            i_rem, v_rem = self._smu.query('print(smub.measure.iv())').split('\t')
+            volt_rem.append(float(v_rem.strip('\n')))
+            curr_rem.append(float(i_rem.strip('\n')))
+            i_rem = float(i_rem.strip('\n'))
+            v_rem = float(v_rem.strip('\n'))
+            time.sleep(Tread/2)
+            self._smu.write('smub.source.output = smub.OUTPUT_OFF')
+            sys.stdout.write(f'\rR = {abs(v_rem/i_rem)*1e-6} MOhm')
+            time.sleep(T2*10)
+            if time.time() - t0 > Tmax:    
+                break
+        
+        self._smu.write('smub.source.output = smub.OUTPUT_OFF')
+        print(f'\nSe llegó a {Rth*1e-6} MOhm con {len(volt_din)} pulsos')
+        return np.array(t_din), np.array(volt_din), np.array(curr_din), np.array(t_rem), np.array(volt_rem), np.array(curr_rem), len(volt_din), Rth
+   
